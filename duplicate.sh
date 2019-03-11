@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-OLD_PROJECT_NAMESPACE="github.com/denouche"
+OLD_PROJECT_NAMESPACE="github.com/adeo"
 OLD_PROJECT_NAME="go-api-skeleton"
 OLD_PROJECT_FULL_NAME="${OLD_PROJECT_NAMESPACE}/${OLD_PROJECT_NAME}"
 
@@ -14,7 +14,7 @@ NEW_PROJECT_FULL_NAME="${NEW_PROJECT_NAMESPACE}/${NEW_PROJECT_NAME}"
 
 find . -iname '*.go' -exec sed -i "s|${OLD_PROJECT_FULL_NAME}|${NEW_PROJECT_FULL_NAME}|g" {} \;
 sed -i "s|${OLD_PROJECT_FULL_NAME}|${NEW_PROJECT_FULL_NAME}|g" Makefile Dockerfile
-sed -i "s|${OLD_PROJECT_NAME}|${NEW_PROJECT_NAME}|g" Makefile Dockerfile
+sed -i "s|${OLD_PROJECT_NAME}|${NEW_PROJECT_NAME}|g" Makefile Dockerfile tom.yml
 
 main()
 {

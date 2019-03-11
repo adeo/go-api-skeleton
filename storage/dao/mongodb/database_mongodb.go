@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/denouche/go-api-skeleton/storage/dao"
-	"github.com/denouche/go-api-skeleton/utils"
+	"github.com/adeo/go-api-skeleton/storage/dao"
+	"github.com/adeo/go-api-skeleton/utils"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"

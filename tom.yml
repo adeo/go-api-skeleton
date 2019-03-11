@@ -1,0 +1,7 @@
+group: turbine
+name: go-api-skeleton
+version:
+  app: 0.0.1
+  build: '1'
+incrementStrategy: app
+

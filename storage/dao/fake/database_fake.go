@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/denouche/go-api-skeleton/utils"
+	"github.com/adeo/go-api-skeleton/utils"
 
 	"github.com/allegro/bigcache"
-	"github.com/denouche/go-api-skeleton/storage/dao"
+	"github.com/adeo/go-api-skeleton/storage/dao"
 )
 
 type DatabaseFake struct {

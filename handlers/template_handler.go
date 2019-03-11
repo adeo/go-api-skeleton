@@ -4,15 +4,15 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/denouche/go-api-skeleton/storage/dao"
-	"github.com/denouche/go-api-skeleton/storage/model"
-	"github.com/denouche/go-api-skeleton/storage/validators"
-	"github.com/denouche/go-api-skeleton/utils"
+	"github.com/adeo/go-api-skeleton/storage/dao"
+	"github.com/adeo/go-api-skeleton/storage/model"
+	"github.com/adeo/go-api-skeleton/storage/validators"
+	"github.com/adeo/go-api-skeleton/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 )
 
-func (hc *handlersContext) GetAllTemplates(c *gin.Context) {
+func (hc *Context) GetAllTemplates(c *gin.Context) {
 	templates, err := hc.db.GetAllTemplates()
 	if err != nil {
 		utils.GetLoggerFromCtx(c).WithError(err).Error("error while getting templates")
@@ -22,7 +22,7 @@ func (hc *handlersContext) GetAllTemplates(c *gin.Context) {
 	utils.JSON(c.Writer, http.StatusOK, templates)
 }
 
-func (hc *handlersContext) CreateTemplate(c *gin.Context) {
+func (hc *Context) CreateTemplate(c *gin.Context) {
 	b, err := c.GetRawData()
 	if err != nil {
 		utils.GetLoggerFromCtx(c).WithError(err).Error("error while creating template, read data fail")
@@ -67,7 +67,7 @@ func (hc *handlersContext) CreateTemplate(c *gin.Context) {
 	utils.JSON(c.Writer, http.StatusCreated, template)
 }
 
-func (hc *handlersContext) GetTemplate(c *gin.Context) {
+func (hc *Context) GetTemplate(c *gin.Context) {
 	templateID := c.Param("id")
 
 	err := hc.validator.VarCtx(c, templateID, "required")
@@ -101,7 +101,7 @@ func (hc *handlersContext) GetTemplate(c *gin.Context) {
 	utils.JSON(c.Writer, http.StatusOK, template)
 }
 
-func (hc *handlersContext) DeleteTemplate(c *gin.Context) {
+func (hc *Context) DeleteTemplate(c *gin.Context) {
 	templateID := c.Param("id")
 
 	err := hc.validator.VarCtx(c, templateID, "required")
@@ -148,7 +148,7 @@ func (hc *handlersContext) DeleteTemplate(c *gin.Context) {
 	utils.JSON(c.Writer, http.StatusNoContent, nil)
 }
 
-func (hc *handlersContext) UpdateTemplate(c *gin.Context) {
+func (hc *Context) UpdateTemplate(c *gin.Context) {
 	templateID := c.Param("id")
 
 	err := hc.validator.VarCtx(c, templateID, "required")

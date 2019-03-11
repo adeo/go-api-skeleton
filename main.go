@@ -1,6 +1,6 @@
 package main
 
-import "github.com/denouche/go-api-skeleton/cmd"
+import "github.com/adeo/go-api-skeleton/cmd"
 
 func main() {
 	cmd.Execute()

@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/denouche/go-api-skeleton/storage/model"
+	"github.com/adeo/go-api-skeleton/storage/model"
 )
 
 func JSON(w http.ResponseWriter, status int, data interface{}) {

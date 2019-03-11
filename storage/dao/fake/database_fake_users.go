@@ -5,10 +5,10 @@ import (
 	"errors"
 	"time"
 
-	"github.com/denouche/go-api-skeleton/utils"
+	"github.com/adeo/go-api-skeleton/utils"
 
-	"github.com/denouche/go-api-skeleton/storage/dao"
-	"github.com/denouche/go-api-skeleton/storage/model"
+	"github.com/adeo/go-api-skeleton/storage/dao"
+	"github.com/adeo/go-api-skeleton/storage/model"
 	"github.com/satori/go.uuid"
 )
 

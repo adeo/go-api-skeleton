@@ -1,5 +1,5 @@
-NAME := go-api-skeleton
-VERSION := 0.0.1
+NAME := $(shell cat tom.yml | sed -r '/name:/!d;s/.*: *'"'"'?([^$$])'"'"'?/\1/')
+VERSION := $(shell cat tom.yml | sed -r '/app:/!d;s/.*: *'"'"'?([^$$])'"'"'?/\1/')
 
 .PHONY: help
 help: ## display this help
@@ -16,7 +16,7 @@ deps: ## get the golang dependencies in the vendor folder
 
 .PHONY: build
 build: ##  build the executable and set the version
-	go build -o go-api-skeleton -ldflags "-X github.com/denouche/go-api-skeleton/handlers.ApplicationVersion=$(VERSION) -X github.com/denouche/go-api-skeleton/handlers.ApplicationName=$(NAME)" main.go
+	go build -o go-api-skeleton -ldflags "-X github.com/adeo/go-api-skeleton/handlers.ApplicationVersion=$(VERSION) -X github.com/adeo/go-api-skeleton/handlers.ApplicationName=$(NAME)" main.go
 
 .PHONY: test
 test: ## run go test

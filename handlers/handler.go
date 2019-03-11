@@ -5,15 +5,21 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/denouche/go-api-skeleton/middlewares"
-	"github.com/denouche/go-api-skeleton/storage/dao"
-	"github.com/denouche/go-api-skeleton/storage/dao/fake"
-	"github.com/denouche/go-api-skeleton/storage/dao/mock"
-	"github.com/denouche/go-api-skeleton/storage/dao/mongodb"
-	"github.com/denouche/go-api-skeleton/storage/dao/postgresql"
-	"github.com/denouche/go-api-skeleton/storage/validators"
+	"github.com/adeo/go-api-skeleton/middlewares"
+	"github.com/adeo/go-api-skeleton/storage/dao"
+	"github.com/adeo/go-api-skeleton/storage/dao/fake"
+	"github.com/adeo/go-api-skeleton/storage/dao/mock"
+	"github.com/adeo/go-api-skeleton/storage/dao/mongodb"
+	"github.com/adeo/go-api-skeleton/storage/dao/postgresql"
+	"github.com/adeo/go-api-skeleton/storage/validators"
 	"github.com/gin-gonic/gin"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"gopkg.in/go-playground/validator.v9"
+)
+
+var (
+	ApplicationName    = ""
+	ApplicationVersion = "dev"
 )
 
 type Config struct {
@@ -21,17 +27,35 @@ type Config struct {
 	DBInMemory      bool
 	DBConnectionURI string
 	DBName          string
-	Port            int
+	PortAPI         int
+	PortMonitoring  int
 	LogLevel        string
 	LogFormat       string
 }
 
-type handlersContext struct {
+type Context struct {
 	db        dao.Database
 	validator *validator.Validate
 }
 
-func NewRouter(config *Config) *gin.Engine {
+func NewHandlersContext(config *Config) *Context {
+	hc := &Context{}
+	if config.Mock {
+		hc.db = mock.NewDatabaseMock()
+	} else if config.DBInMemory {
+		hc.db = fake.NewDatabaseFake()
+	} else if strings.HasPrefix(config.DBConnectionURI, "postgresql://") {
+		hc.db = postgresql.NewDatabasePostgreSQL(config.DBConnectionURI)
+	} else if strings.HasPrefix(config.DBConnectionURI, "mongodb://") {
+		hc.db = mongodb.NewDatabaseMongoDB(config.DBConnectionURI, config.DBName)
+	} else {
+		hc.db = fake.NewDatabaseFake()
+	}
+	hc.validator = newValidator()
+	return hc
+}
+
+func NewMonitoringRouter(hc *Context) *gin.Engine {
 	gin.SetMode(gin.ReleaseMode)
 
 	router := gin.New()
@@ -41,22 +65,25 @@ func NewRouter(config *Config) *gin.Engine {
 	router.Use(middlewares.GetLoggerMiddleware())
 	router.Use(middlewares.GetHTTPLoggerMiddleware())
 
-	hc := &handlersContext{}
-	if config.Mock {
-		hc.db = mock.NewDatabaseMock()
-	} else if config.DBInMemory {
-		hc.db = fake.NewDatabaseFake()
-	} else if strings.HasPrefix(config.DBConnectionURI, "postgresql://") {
-		hc.db = postgresql.NewDatabasePostgreSQL(config.DBConnectionURI)
-	} else if strings.HasPrefix(config.DBConnectionURI, "mongodb://") {
-		hc.db = mongodb.NewDatabaseMongoDB(config.DBConnectionURI, config.DBName) // TODO parameter
-	} else {
-		hc.db = fake.NewDatabaseFake()
-	}
-	hc.validator = newValidator()
-
 	public := router.Group("/")
 	public.Handle(http.MethodGet, "/_health", hc.GetHealth)
+	public.Handle(http.MethodGet, "/prometheus", gin.WrapH(promhttp.Handler()))
+
+	return router
+}
+
+func NewAPIRouter(hc *Context) *gin.Engine {
+	gin.SetMode(gin.ReleaseMode)
+
+	router := gin.New()
+	router.HandleMethodNotAllowed = true
+
+	router.Use(gin.Recovery())
+	router.Use(middlewares.NewPrometheusMiddleware(ApplicationName).Handler())
+	router.Use(middlewares.GetLoggerMiddleware())
+	router.Use(middlewares.GetHTTPLoggerMiddleware())
+
+	public := router.Group("/")
 
 	// start: user routes
 	public.Handle(http.MethodGet, "/users", hc.GetAllUsers)

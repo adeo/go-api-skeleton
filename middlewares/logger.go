@@ -4,7 +4,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/denouche/go-api-skeleton/utils"
+	"github.com/adeo/go-api-skeleton/utils"
 	"github.com/gin-gonic/gin"
 )
 

@@ -4,14 +4,14 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/denouche/go-api-skeleton/storage/dao"
-	"github.com/denouche/go-api-skeleton/storage/model"
-	"github.com/denouche/go-api-skeleton/storage/validators"
-	"github.com/denouche/go-api-skeleton/utils"
+	"github.com/adeo/go-api-skeleton/storage/dao"
+	"github.com/adeo/go-api-skeleton/storage/model"
+	"github.com/adeo/go-api-skeleton/storage/validators"
+	"github.com/adeo/go-api-skeleton/utils"
 	"github.com/gin-gonic/gin"
 )
 
-func (hc *handlersContext) GetAllUsers(c *gin.Context) {
+func (hc *Context) GetAllUsers(c *gin.Context) {
 	users, err := hc.db.GetAllUsers()
 	if err != nil {
 		utils.GetLoggerFromCtx(c).WithError(err).Error("error while getting users")
@@ -21,7 +21,7 @@ func (hc *handlersContext) GetAllUsers(c *gin.Context) {
 	utils.JSON(c.Writer, http.StatusOK, users)
 }
 
-func (hc *handlersContext) CreateUser(c *gin.Context) {
+func (hc *Context) CreateUser(c *gin.Context) {
 	b, err := c.GetRawData()
 	if err != nil {
 		utils.GetLoggerFromCtx(c).WithError(err).Error("error while creating user, read data fail")
@@ -66,7 +66,7 @@ func (hc *handlersContext) CreateUser(c *gin.Context) {
 	utils.JSON(c.Writer, http.StatusCreated, user)
 }
 
-func (hc *handlersContext) GetUser(c *gin.Context) {
+func (hc *Context) GetUser(c *gin.Context) {
 	userID := c.Param("id")
 
 	err := hc.validator.VarCtx(c, userID, "required")
@@ -100,7 +100,7 @@ func (hc *handlersContext) GetUser(c *gin.Context) {
 	utils.JSON(c.Writer, http.StatusOK, user)
 }
 
-func (hc *handlersContext) DeleteUser(c *gin.Context) {
+func (hc *Context) DeleteUser(c *gin.Context) {
 	userID := c.Param("id")
 
 	err := hc.validator.VarCtx(c, userID, "required")
@@ -147,7 +147,7 @@ func (hc *handlersContext) DeleteUser(c *gin.Context) {
 	utils.JSON(c.Writer, http.StatusNoContent, nil)
 }
 
-func (hc *handlersContext) UpdateUser(c *gin.Context) {
+func (hc *Context) UpdateUser(c *gin.Context) {
 	userID := c.Param("id")
 
 	err := hc.validator.VarCtx(c, userID, "required")

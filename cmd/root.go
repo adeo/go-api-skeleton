@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/denouche/go-api-skeleton/handlers"
-	"github.com/denouche/go-api-skeleton/utils"
+	"github.com/adeo/go-api-skeleton/handlers"
+	"github.com/adeo/go-api-skeleton/utils"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -23,7 +23,8 @@ const (
 	parameterDBConnectionURI   = "dbconnectionuri"
 	parameterDBInMemory        = "dbinmemory"
 	parameterDBName            = "dbname"
-	parameterPort              = "port"
+	parameterPortAPI           = "portapi"
+	parameterPortMonitoring    = "portmonitoring"
 )
 
 var (
@@ -31,7 +32,8 @@ var (
 	defaultLogFormat       = utils.LogFormatText
 	defaultDBConnectionURI = ""
 	defaultDBName          = ""
-	defaultPort            = 8080
+	defaultPortAPI         = 8080
+	defaultPortMonitoring  = 8081
 )
 
 var rootCmd = &cobra.Command{
@@ -44,16 +46,22 @@ var rootCmd = &cobra.Command{
 			WithField(parameterConfigurationFile, cfgFile).
 			WithField(parameterLogLevel, config.LogLevel).
 			WithField(parameterLogFormat, config.LogFormat).
-			WithField(parameterPort, config.Port).
+			WithField(parameterPortAPI, config.PortAPI).
+			WithField(parameterPortMonitoring, config.PortMonitoring).
 			WithField(parameterDBInMemory, config.Mock).
 			WithField(parameterDBConnectionURI, config.DBConnectionURI).
 			WithField(parameterDBName, config.DBName).
 			Warn("Configuration")
 
-		router := handlers.NewRouter(config)
-		err := router.Run(fmt.Sprintf(":%d", config.Port))
+		hc := handlers.NewHandlersContext(config)
+
+		monitoringRouter := handlers.NewMonitoringRouter(hc)
+		go monitoringRouter.Run(fmt.Sprintf(":%d", config.PortMonitoring))
+
+		apiRouter := handlers.NewAPIRouter(hc)
+		err := apiRouter.Run(fmt.Sprintf(":%d", config.PortAPI))
 		if err != nil {
-			utils.GetLogger().WithError(err).Error("error while starting app")
+			utils.GetLogger().WithError(err).Error("error while starting app monitoring router")
 		}
 	},
 }
@@ -76,8 +84,11 @@ func init() {
 	rootCmd.Flags().String(parameterLogFormat, defaultLogFormat, "Use this flag to set the logging format")
 	_ = viper.BindPFlag(parameterLogFormat, rootCmd.Flags().Lookup(parameterLogFormat))
 
-	rootCmd.Flags().Int(parameterPort, defaultPort, "Use this flag to set the listening port of the api")
-	_ = viper.BindPFlag(parameterPort, rootCmd.Flags().Lookup(parameterPort))
+	rootCmd.Flags().Int(parameterPortAPI, defaultPortAPI, "Use this flag to set the listening port of the api")
+	_ = viper.BindPFlag(parameterPortAPI, rootCmd.Flags().Lookup(parameterPortAPI))
+
+	rootCmd.Flags().Int(parameterPortMonitoring, defaultPortMonitoring, "Use this flag to set the listening port of the monitoring apis")
+	_ = viper.BindPFlag(parameterPortMonitoring, rootCmd.Flags().Lookup(parameterPortMonitoring))
 
 	rootCmd.Flags().String(parameterDBConnectionURI, defaultDBConnectionURI, "Use this flag to set the db connection URI")
 	_ = viper.BindPFlag(parameterDBConnectionURI, rootCmd.Flags().Lookup(parameterDBConnectionURI))
@@ -105,7 +116,8 @@ func initConfig() {
 
 	config.LogLevel = viper.GetString(parameterLogLevel)
 	config.LogFormat = viper.GetString(parameterLogFormat)
-	config.Port = viper.GetInt(parameterPort)
+	config.PortAPI = viper.GetInt(parameterPortAPI)
+	config.PortMonitoring = viper.GetInt(parameterPortMonitoring)
 	config.DBConnectionURI = viper.GetString(parameterDBConnectionURI)
 	config.DBName = viper.GetString(parameterDBName)
 	config.DBInMemory = viper.GetBool(parameterDBInMemory)

@@ -3,8 +3,8 @@ package postgresql
 import (
 	"database/sql"
 
-	"github.com/denouche/go-api-skeleton/storage/dao"
-	"github.com/denouche/go-api-skeleton/utils"
+	"github.com/adeo/go-api-skeleton/storage/dao"
+	"github.com/adeo/go-api-skeleton/utils"
 	"github.com/lib/pq"
 )
 
