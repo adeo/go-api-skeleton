@@ -1,0 +1,21 @@
+FROM node:10
+
+RUN apt-get update \
+    && apt-get install -y git-core \
+    && apt-get clean
+RUN mkdir /root/.ssh && echo "StrictHostKeyChecking no" > /root/.ssh/config
+
+ARG GITHUB_ACCOUNT
+ARG GITHUB_MAIL
+ARG GITHUB_SSH_PRIVATEKEY
+ENV GITHUB_ACCOUNT=$GITHUB_ACCOUNT
+ENV GITHUB_MAIL=$GITHUB_MAIL
+ENV GITHUB_SSH_PRIVATEKEY=$GITHUB_SSH_PRIVATEKEY
+
+RUN git config --global user.email "${GITHUB_ACCOUNT}"
+RUN git config --global user.name "${GITHUB_MAIL}"
+
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
+COPY . /usr/src/app
+RUN npm i -g standard-version

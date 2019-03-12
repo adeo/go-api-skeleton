@@ -1,4 +1,4 @@
-group: turbine
+group: go-group-skeleton
 name: go-api-skeleton
 version:
   app: 0.0.1

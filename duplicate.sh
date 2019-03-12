@@ -4,17 +4,24 @@
 OLD_PROJECT_NAMESPACE="github.com/adeo"
 OLD_PROJECT_NAME="go-api-skeleton"
 OLD_PROJECT_FULL_NAME="${OLD_PROJECT_NAMESPACE}/${OLD_PROJECT_NAME}"
+OLD_PROJECT_GROUP="go-group-skeleton"
 
+echo "What is the new project group? (Eg. turbine, qualite)"
+read NEW_PROJECT_GROUP
 echo "What is the new namespace? (Eg. if you are creating project under 'github.com/foo/bar', enter 'github.com/foo')"
 read NEW_PROJECT_NAMESPACE
 echo "What is the new project name? (Eg. if you are creating project under 'github.com/foo/bar', enter 'bar'))"
 read NEW_PROJECT_NAME
 
 NEW_PROJECT_FULL_NAME="${NEW_PROJECT_NAMESPACE}/${NEW_PROJECT_NAME}"
+OLD_PROJECT_GIT="$(echo "$OLD_PROJECT_NAMESPACE" | sed 's|/|:|')"
+NEW_PROJECT_GIT="$(echo "$NEW_PROJECT_NAMESPACE" | sed 's|/|:|')"
 
 find . -iname '*.go' -exec sed -i "s|${OLD_PROJECT_FULL_NAME}|${NEW_PROJECT_FULL_NAME}|g" {} \;
 sed -i "s|${OLD_PROJECT_FULL_NAME}|${NEW_PROJECT_FULL_NAME}|g" Makefile Dockerfile
-sed -i "s|${OLD_PROJECT_NAME}|${NEW_PROJECT_NAME}|g" Makefile Dockerfile tom.yml
+sed -i "s|${OLD_PROJECT_NAME}|${NEW_PROJECT_NAME}|g" Makefile Dockerfile tom.yml .gitlab-ci.yml
+sed -i "s|${OLD_PROJECT_GROUP}|${NEW_PROJECT_GROUP}|g" Makefile Dockerfile tom.yml .gitlab-ci.yml
+sed -i "s|${OLD_PROJECT_GIT}|${NEW_PROJECT_GIT}|g" .gitlab-ci.yml
 
 main()
 {

@@ -21,3 +21,14 @@ build: ##  build the executable and set the version
 .PHONY: test
 test: ## run go test
 	go test -v ./...
+
+.PHONY: bump
+bump: ## bump the version in the tom.yml file
+	NEW_VERSION=`standard-version --dry-run | sed -r '/tagging release/!d;s/.*tagging release *v?(.*)/\1/g'`; \
+		sed -r -i 's/^(.*app: *).*$$/\1'$$NEW_VERSION'/' tom.yml
+
+.PHONY: release
+release: bump ## bump the version in the tom.yml, and make a release (commit, tag and push)
+	git add tom.yml
+	standard-version --message "chore(release): %s [ci skip]" --commit-all
+	git push --follow-tags origin HEAD
