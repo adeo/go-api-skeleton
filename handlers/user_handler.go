@@ -11,7 +11,26 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (hc *Context) GetAllUsers(c *gin.Context) {
+// @openapi:path
+// /users:
+//	get:
+//		description: "Get all the users"
+//		responses:
+//			200:
+//				description: "The array containing the users"
+//				content:
+//					application/json:
+//						schema:
+//							type: "array"
+//							items:
+//								$ref: "#/components/schemas/User"
+//			500:
+//				description: "Server error"
+//				content:
+//					application/json:
+//						schema:
+//							$ref: "#/components/schemas/APIError"
+func (hc *handlersContext) GetAllUsers(c *gin.Context) {
 	users, err := hc.db.GetAllUsers()
 	if err != nil {
 		utils.GetLoggerFromCtx(c).WithError(err).Error("error while getting users")
@@ -21,7 +40,45 @@ func (hc *Context) GetAllUsers(c *gin.Context) {
 	utils.JSON(c.Writer, http.StatusOK, users)
 }
 
-func (hc *Context) CreateUser(c *gin.Context) {
+// @openapi:path
+// /users:
+//	post:
+//		description: "Create a new user"
+//		requestBody:
+//			description: The user data.
+//			required: true
+//			content:
+//				application/vnd.api+json:
+//					schema:
+//						$ref: "#/components/schemas/UserEditable"
+//		responses:
+//			201:
+//				description: "The array containing the users"
+//				content:
+//					application/json:
+//						schema:
+//							type: "array"
+//							items:
+//								$ref: "#/components/schemas/User"
+//			400:
+//				description: "This error occurs when the request is not correct (bad body format, validation error)"
+//				content:
+//					application/json:
+//						schema:
+//							$ref: "#/components/schemas/APIError"
+//			409:
+//				description: "This error occurs when the new entity is in conflict with exiting one (duplicated)"
+//				content:
+//					application/json:
+//						schema:
+//							$ref: "#/components/schemas/APIError"
+//			500:
+//				description: "Server error"
+//				content:
+//					application/json:
+//						schema:
+//							$ref: "#/components/schemas/APIError"
+func (hc *handlersContext) CreateUser(c *gin.Context) {
 	b, err := c.GetRawData()
 	if err != nil {
 		utils.GetLoggerFromCtx(c).WithError(err).Error("error while creating user, read data fail")
@@ -66,7 +123,37 @@ func (hc *Context) CreateUser(c *gin.Context) {
 	utils.JSON(c.Writer, http.StatusCreated, user)
 }
 
-func (hc *Context) GetUser(c *gin.Context) {
+// @openapi:path
+// /users/{userID}:
+//	get:
+//		description: "Get a user"
+//		parameters:
+//		- in: path
+//		  name: userID
+//		  schema:
+//		  	type: string
+//		  required: true
+//		  description: "The user id to get"
+//		responses:
+//			200:
+//				description: "The users with id `userID`"
+//				content:
+//					application/json:
+//						schema:
+//							$ref: "#/components/schemas/User"
+//			404:
+//				description: "User not found"
+//				content:
+//					application/json:
+//						schema:
+//							$ref: "#/components/schemas/APIError"
+//			500:
+//				description: "Server error"
+//				content:
+//					application/json:
+//						schema:
+//							$ref: "#/components/schemas/APIError"
+func (hc *handlersContext) GetUser(c *gin.Context) {
 	userID := c.Param("id")
 
 	err := hc.validator.VarCtx(c, userID, "required")
@@ -100,7 +187,33 @@ func (hc *Context) GetUser(c *gin.Context) {
 	utils.JSON(c.Writer, http.StatusOK, user)
 }
 
-func (hc *Context) DeleteUser(c *gin.Context) {
+// @openapi:path
+// /users/{userID}:
+//	delete:
+//		description: "Delete a user"
+//		parameters:
+//		- in: path
+//		  name: userID
+//		  schema:
+//		  	type: string
+//		  required: true
+//		  description: "The user id to delete"
+//		responses:
+//			204:
+//				description: "Users with id `userID` deleted"
+//			404:
+//				description: "User not found"
+//				content:
+//					application/json:
+//						schema:
+//							$ref: "#/components/schemas/APIError"
+//			500:
+//				description: "Server error"
+//				content:
+//					application/json:
+//						schema:
+//							$ref: "#/components/schemas/APIError"
+func (hc *handlersContext) DeleteUser(c *gin.Context) {
 	userID := c.Param("id")
 
 	err := hc.validator.VarCtx(c, userID, "required")
@@ -147,7 +260,52 @@ func (hc *Context) DeleteUser(c *gin.Context) {
 	utils.JSON(c.Writer, http.StatusNoContent, nil)
 }
 
-func (hc *Context) UpdateUser(c *gin.Context) {
+// @openapi:path
+// /users/{userID}:
+//	put:
+//		description: "Update a user"
+//		parameters:
+//		- in: path
+//		  name: userID
+//		  schema:
+//		  	type: string
+//		  required: true
+//		  description: "The user id to update"
+//		requestBody:
+//			description: The user data.
+//			required: true
+//			content:
+//				application/vnd.api+json:
+//					schema:
+//						$ref: "#/components/schemas/UserEditable"
+//		responses:
+//			201:
+//				description: "The array containing the users"
+//				content:
+//					application/json:
+//						schema:
+//							type: "array"
+//							items:
+//								$ref: "#/components/schemas/User"
+//			400:
+//				description: "This error occurs when the request is not correct (bad body format, validation error)"
+//				content:
+//					application/json:
+//						schema:
+//							$ref: "#/components/schemas/APIError"
+//			404:
+//				description: "User not found"
+//				content:
+//					application/json:
+//						schema:
+//							$ref: "#/components/schemas/APIError"
+//			500:
+//				description: "Server error"
+//				content:
+//					application/json:
+//						schema:
+//							$ref: "#/components/schemas/APIError"
+func (hc *handlersContext) UpdateUser(c *gin.Context) {
 	userID := c.Param("id")
 
 	err := hc.validator.VarCtx(c, userID, "required")
@@ -164,7 +322,7 @@ func (hc *Context) UpdateUser(c *gin.Context) {
 			utils.JSONErrorWithMessage(c.Writer, model.ErrNotFound, "User to update not found")
 			return
 		default:
-			utils.GetLoggerFromCtx(c).WithError(err).WithField("type", e.Type).Error("deleteUser: get user error type not handled")
+			utils.GetLoggerFromCtx(c).WithError(err).WithField("type", e.Type).Error("UpdateUser: get user error type not handled")
 			utils.JSONError(c.Writer, model.ErrInternalServer)
 			return
 		}

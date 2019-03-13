@@ -9,10 +9,28 @@ import (
 	"github.com/adeo/go-api-skeleton/storage/validators"
 	"github.com/adeo/go-api-skeleton/utils"
 	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
 )
 
-func (hc *Context) GetAllTemplates(c *gin.Context) {
+// @openapi:path
+// /templates:
+//	get:
+//		description: "Get all the templates"
+//		responses:
+//			200:
+//				description: "The array containing the templates"
+//				content:
+//					application/json:
+//						schema:
+//							type: "array"
+//							items:
+//								$ref: "#/components/schemas/Template"
+//			500:
+//				description: "Server error"
+//				content:
+//					application/json:
+//						schema:
+//							$ref: "#/components/schemas/APIError"
+func (hc *handlersContext) GetAllTemplates(c *gin.Context) {
 	templates, err := hc.db.GetAllTemplates()
 	if err != nil {
 		utils.GetLoggerFromCtx(c).WithError(err).Error("error while getting templates")
@@ -22,7 +40,45 @@ func (hc *Context) GetAllTemplates(c *gin.Context) {
 	utils.JSON(c.Writer, http.StatusOK, templates)
 }
 
-func (hc *Context) CreateTemplate(c *gin.Context) {
+// @openapi:path
+// /templates:
+//	post:
+//		description: "Create a new template"
+//		requestBody:
+//			description: The template data.
+//			required: true
+//			content:
+//				application/vnd.api+json:
+//					schema:
+//						$ref: "#/components/schemas/TemplateEditable"
+//		responses:
+//			201:
+//				description: "The array containing the templates"
+//				content:
+//					application/json:
+//						schema:
+//							type: "array"
+//							items:
+//								$ref: "#/components/schemas/Template"
+//			400:
+//				description: "This error occurs when the request is not correct (bad body format, validation error)"
+//				content:
+//					application/json:
+//						schema:
+//							$ref: "#/components/schemas/APIError"
+//			409:
+//				description: "This error occurs when the new entity is in conflict with exiting one (duplicated)"
+//				content:
+//					application/json:
+//						schema:
+//							$ref: "#/components/schemas/APIError"
+//			500:
+//				description: "Server error"
+//				content:
+//					application/json:
+//						schema:
+//							$ref: "#/components/schemas/APIError"
+func (hc *handlersContext) CreateTemplate(c *gin.Context) {
 	b, err := c.GetRawData()
 	if err != nil {
 		utils.GetLoggerFromCtx(c).WithError(err).Error("error while creating template, read data fail")
@@ -54,12 +110,12 @@ func (hc *Context) CreateTemplate(c *gin.Context) {
 			utils.JSONErrorWithMessage(c.Writer, model.ErrAlreadyExists, "Template already exists")
 			return
 		default:
-			logrus.WithError(err).WithField("type", e.Type).Error("error CreateTemplate: Error type not handled")
+			utils.GetLoggerFromCtx(c).WithError(err).WithField("type", e.Type).Error("error CreateTemplate: Error type not handled")
 			utils.JSONError(c.Writer, model.ErrInternalServer)
 			return
 		}
 	} else if err != nil {
-		logrus.WithError(err).Error("error while creating template")
+		utils.GetLoggerFromCtx(c).WithError(err).Error("error while creating template")
 		utils.JSONError(c.Writer, model.ErrInternalServer)
 		return
 	}
@@ -67,7 +123,37 @@ func (hc *Context) CreateTemplate(c *gin.Context) {
 	utils.JSON(c.Writer, http.StatusCreated, template)
 }
 
-func (hc *Context) GetTemplate(c *gin.Context) {
+// @openapi:path
+// /templates/{templateID}:
+//	get:
+//		description: "Get a template"
+//		parameters:
+//		- in: path
+//		  name: templateID
+//		  schema:
+//		  	type: string
+//		  required: true
+//		  description: "The template id to get"
+//		responses:
+//			200:
+//				description: "The templates with id `templateID`"
+//				content:
+//					application/json:
+//						schema:
+//							$ref: "#/components/schemas/Template"
+//			404:
+//				description: "Template not found"
+//				content:
+//					application/json:
+//						schema:
+//							$ref: "#/components/schemas/APIError"
+//			500:
+//				description: "Server error"
+//				content:
+//					application/json:
+//						schema:
+//							$ref: "#/components/schemas/APIError"
+func (hc *handlersContext) GetTemplate(c *gin.Context) {
 	templateID := c.Param("id")
 
 	err := hc.validator.VarCtx(c, templateID, "required")
@@ -83,12 +169,12 @@ func (hc *Context) GetTemplate(c *gin.Context) {
 			utils.JSONErrorWithMessage(c.Writer, model.ErrNotFound, "Template not found")
 			return
 		default:
-			logrus.WithError(err).WithField("type", e.Type).Error("error GetTemplate: get template error type not handled")
+			utils.GetLoggerFromCtx(c).WithError(err).WithField("type", e.Type).Error("error GetTemplate: get template error type not handled")
 			utils.JSONError(c.Writer, model.ErrInternalServer)
 			return
 		}
 	} else if err != nil {
-		logrus.WithError(err).Error("error while get template")
+		utils.GetLoggerFromCtx(c).WithError(err).Error("error while get template")
 		utils.JSONError(c.Writer, model.ErrInternalServer)
 		return
 	}
@@ -101,7 +187,33 @@ func (hc *Context) GetTemplate(c *gin.Context) {
 	utils.JSON(c.Writer, http.StatusOK, template)
 }
 
-func (hc *Context) DeleteTemplate(c *gin.Context) {
+// @openapi:path
+// /templates/{templateID}:
+//	delete:
+//		description: "Delete a template"
+//		parameters:
+//		- in: path
+//		  name: templateID
+//		  schema:
+//		  	type: string
+//		  required: true
+//		  description: "The template id to delete"
+//		responses:
+//			204:
+//				description: "Templates with id `templateID` deleted"
+//			404:
+//				description: "Template not found"
+//				content:
+//					application/json:
+//						schema:
+//							$ref: "#/components/schemas/APIError"
+//			500:
+//				description: "Server error"
+//				content:
+//					application/json:
+//						schema:
+//							$ref: "#/components/schemas/APIError"
+func (hc *handlersContext) DeleteTemplate(c *gin.Context) {
 	templateID := c.Param("id")
 
 	err := hc.validator.VarCtx(c, templateID, "required")
@@ -118,12 +230,12 @@ func (hc *Context) DeleteTemplate(c *gin.Context) {
 			utils.JSONErrorWithMessage(c.Writer, model.ErrNotFound, "Template to delete not found")
 			return
 		default:
-			logrus.WithError(err).WithField("type", e.Type).Error("error DeleteTemplate: get template error type not handled")
+			utils.GetLoggerFromCtx(c).WithError(err).WithField("type", e.Type).Error("error DeleteTemplate: get template error type not handled")
 			utils.JSONError(c.Writer, model.ErrInternalServer)
 			return
 		}
 	} else if err != nil {
-		logrus.WithError(err).Error("error while get template to delete")
+		utils.GetLoggerFromCtx(c).WithError(err).Error("error while get template to delete")
 		utils.JSONError(c.Writer, model.ErrInternalServer)
 		return
 	}
@@ -135,12 +247,12 @@ func (hc *Context) DeleteTemplate(c *gin.Context) {
 			utils.JSONErrorWithMessage(c.Writer, model.ErrNotFound, "Template to delete not found")
 			return
 		default:
-			logrus.WithError(err).WithField("type", e.Type).Error("error DeleteTemplate: Error type not handled")
+			utils.GetLoggerFromCtx(c).WithError(err).WithField("type", e.Type).Error("error DeleteTemplate: Error type not handled")
 			utils.JSONError(c.Writer, model.ErrInternalServer)
 			return
 		}
 	} else if err != nil {
-		logrus.WithError(err).Error("error while deleting template")
+		utils.GetLoggerFromCtx(c).WithError(err).Error("error while deleting template")
 		utils.JSONError(c.Writer, model.ErrInternalServer)
 		return
 	}
@@ -148,7 +260,52 @@ func (hc *Context) DeleteTemplate(c *gin.Context) {
 	utils.JSON(c.Writer, http.StatusNoContent, nil)
 }
 
-func (hc *Context) UpdateTemplate(c *gin.Context) {
+// @openapi:path
+// /templates/{templateID}:
+//	put:
+//		description: "Update a template"
+//		parameters:
+//		- in: path
+//		  name: templateID
+//		  schema:
+//		  	type: string
+//		  required: true
+//		  description: "The template id to update"
+//		requestBody:
+//			description: The template data.
+//			required: true
+//			content:
+//				application/vnd.api+json:
+//					schema:
+//						$ref: "#/components/schemas/TemplateEditable"
+//		responses:
+//			201:
+//				description: "The array containing the templates"
+//				content:
+//					application/json:
+//						schema:
+//							type: "array"
+//							items:
+//								$ref: "#/components/schemas/Template"
+//			400:
+//				description: "This error occurs when the request is not correct (bad body format, validation error)"
+//				content:
+//					application/json:
+//						schema:
+//							$ref: "#/components/schemas/APIError"
+//			404:
+//				description: "Template not found"
+//				content:
+//					application/json:
+//						schema:
+//							$ref: "#/components/schemas/APIError"
+//			500:
+//				description: "Server error"
+//				content:
+//					application/json:
+//						schema:
+//							$ref: "#/components/schemas/APIError"
+func (hc *handlersContext) UpdateTemplate(c *gin.Context) {
 	templateID := c.Param("id")
 
 	err := hc.validator.VarCtx(c, templateID, "required")
@@ -165,12 +322,12 @@ func (hc *Context) UpdateTemplate(c *gin.Context) {
 			utils.JSONErrorWithMessage(c.Writer, model.ErrNotFound, "Template to update not found")
 			return
 		default:
-			logrus.WithError(err).WithField("type", e.Type).Error("deleteTemplate: get template error type not handled")
+			utils.GetLoggerFromCtx(c).WithError(err).WithField("type", e.Type).Error("UpdateTemplate: get template error type not handled")
 			utils.JSONError(c.Writer, model.ErrInternalServer)
 			return
 		}
 	} else if err != nil {
-		logrus.WithError(err).Error("error while get template to update")
+		utils.GetLoggerFromCtx(c).WithError(err).Error("error while get template to update")
 		utils.JSONError(c.Writer, model.ErrInternalServer)
 		return
 	}
@@ -178,7 +335,7 @@ func (hc *Context) UpdateTemplate(c *gin.Context) {
 	// get body and verify data
 	b, err := c.GetRawData()
 	if err != nil {
-		logrus.WithError(err).Error("error while updating template, read data fail")
+		utils.GetLoggerFromCtx(c).WithError(err).Error("error while updating template, read data fail")
 		utils.JSONError(c.Writer, model.ErrInternalServer)
 		return
 	}
@@ -206,12 +363,12 @@ func (hc *Context) UpdateTemplate(c *gin.Context) {
 			utils.JSONErrorWithMessage(c.Writer, model.ErrNotFound, "Template to update not found")
 			return
 		default:
-			logrus.WithError(err).WithField("type", e.Type).Error("error UpdateTemplate: Error type not handled")
+			utils.GetLoggerFromCtx(c).WithError(err).WithField("type", e.Type).Error("error UpdateTemplate: Error type not handled")
 			utils.JSONError(c.Writer, model.ErrInternalServer)
 			return
 		}
 	} else if err != nil {
-		logrus.WithError(err).Error("error while updating template")
+		utils.GetLoggerFromCtx(c).WithError(err).Error("error while updating template")
 		utils.JSONError(c.Writer, model.ErrInternalServer)
 		return
 	}

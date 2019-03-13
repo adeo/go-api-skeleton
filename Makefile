@@ -3,11 +3,14 @@ VERSION := $(shell cat tom.yml | sed -r '/app:/!d;s/.*: *'"'"'?([^$$])'"'"'?/\1/
 
 .PHONY: help
 help: ## display this help
+	@echo "Name: $(NAME)"
+	@echo "Version: $(VERSION)"
+	@echo
 	@echo "This is the list of available make targets:"
 	@echo " $(shell cat Makefile | sed -r '/^[a-zA-Z-]+:.*##.*/!d;s/## *//;s/$$/\\n/')"
 
 .PHONY: start
-start: ## start the application
+start: openapi ## start the application
 	go run main.go --config config/local.json
 
 .PHONY: deps
@@ -32,3 +35,10 @@ release: bump ## bump the version in the tom.yml, and make a release (commit, ta
 	git add tom.yml
 	standard-version --message "chore(release): %s [ci skip]" --commit-all
 	git push --follow-tags origin HEAD
+
+.PHONY: openapi
+openapi: ## install openapi-parser and generate openapi schema
+	go get github.com/alexjomin/openapi-parser
+	openapi-parser --output openapi.yaml
+	openapi-parser merge --output openapi.yaml --main info.yaml --dir .
+	go generate
