@@ -19,7 +19,7 @@ NEW_PROJECT_GIT="$(echo "$NEW_PROJECT_NAMESPACE" | sed 's|/|:|')"
 
 find . -iname '*.go' -exec sed -i "s|${OLD_PROJECT_FULL_NAME}|${NEW_PROJECT_FULL_NAME}|g" {} \;
 sed -i "s|${OLD_PROJECT_FULL_NAME}|${NEW_PROJECT_FULL_NAME}|g" Makefile Dockerfile
-sed -i "s|${OLD_PROJECT_NAME}|${NEW_PROJECT_NAME}|g" Makefile Dockerfile tom.yml .gitlab-ci.yml
+sed -i "s|${OLD_PROJECT_NAME}|${NEW_PROJECT_NAME}|g" Makefile Dockerfile info.yaml tom.yml .gitlab-ci.yml
 sed -i "s|${OLD_PROJECT_GROUP}|${NEW_PROJECT_GROUP}|g" Makefile Dockerfile tom.yml .gitlab-ci.yml
 sed -i "s|${OLD_PROJECT_GIT}|${NEW_PROJECT_GIT}|g" .gitlab-ci.yml
 

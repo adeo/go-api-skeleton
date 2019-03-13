@@ -26,13 +26,14 @@ test: ## run go test
 	go test -v ./...
 
 .PHONY: bump
-bump: ## bump the version in the tom.yml file
+bump: ## bump the version in the info.yaml, tom.yml file
 	NEW_VERSION=`standard-version --dry-run | sed -r '/tagging release/!d;s/.*tagging release *v?(.*)/\1/g'`; \
+		sed -r -i 's/^(.*version: *).*$$/\1'$$NEW_VERSION'/' info.yaml; \
 		sed -r -i 's/^(.*app: *).*$$/\1'$$NEW_VERSION'/' tom.yml
 
 .PHONY: release
-release: bump ## bump the version in the tom.yml, and make a release (commit, tag and push)
-	git add tom.yml
+release: bump ## bump the version in the info.yaml, tom.yml, and make a release (commit, tag and push)
+	git add info.yaml tom.yml
 	standard-version --message "chore(release): %s [ci skip]" --commit-all
 	git push --follow-tags origin HEAD
 
