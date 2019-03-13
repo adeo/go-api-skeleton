@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/denouche/go-api-skeleton/utils"
+	"github.com/adeo/go-api-skeleton/utils"
 	"github.com/gin-gonic/gin"
 )
 

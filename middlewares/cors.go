@@ -3,7 +3,7 @@ package middlewares
 import (
 	"net/http"
 
-	"github.com/denouche/go-api-skeleton/utils"
+	"github.com/adeo/go-api-skeleton/utils"
 	"github.com/gin-gonic/gin"
 )
 
