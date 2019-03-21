@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/adeo/go-api-skeleton/handlers"
-	"github.com/adeo/go-api-skeleton/utils"
+	"github.com/adeo/turbine-go-api-skeleton/handlers"
+	"github.com/adeo/turbine-go-api-skeleton/utils"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -37,8 +37,8 @@ var (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "go-api-skeleton",
-	Short: "go-api-skeleton",
+	Use:   "turbine-go-api-skeleton",
+	Short: "turbine-go-api-skeleton",
 	Run: func(cmd *cobra.Command, args []string) {
 		utils.InitLogger(config.LogLevel, config.LogFormat)
 

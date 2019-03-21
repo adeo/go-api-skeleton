@@ -3,9 +3,9 @@ stages:
   - release
 
 variables:
-  DEV_CONTAINER_IMAGE: adeo-docker-lmfr-go-group-skeleton-dev.jfrog.io/go-group-skeleton/go-api-skeleton
-  RELEASE_CONTAINER_IMAGE: adeo-docker-lmfr-go-group-skeleton-release.jfrog.io/go-group-skeleton/go-api-skeleton
-  GITHUB_URL: git@github.com:adeo/go-api-skeleton.git
+  DEV_CONTAINER_IMAGE: adeo-docker-lmfr-go-group-skeleton-dev.jfrog.io/go-group-skeleton/turbine-go-api-skeleton
+  RELEASE_CONTAINER_IMAGE: adeo-docker-lmfr-go-group-skeleton-release.jfrog.io/go-group-skeleton/turbine-go-api-skeleton
+  GITHUB_URL: git@github.com:adeo/turbine-go-api-skeleton.git
 
 before_script:
   - docker login -u "$ARTIFACTORY_USER" -p "$ARTIFACTORY_PWD" adeo-docker-lmfr-go-group-skeleton-dev.jfrog.io
@@ -36,8 +36,8 @@ release:
     # specify docker login here because local before_script override global before_script
     - docker login -u "$ARTIFACTORY_USER" -p "$ARTIFACTORY_PWD" adeo-docker-lmfr-go-group-skeleton-release.jfrog.io
   script:
-    - docker build -f Dockerfile.release --build-arg "GITHUB_ACCOUNT=$GITHUB_ACCOUNT" --build-arg "GITHUB_MAIL=$GITHUB_MAIL" --build-arg "GITHUB_SSH_PRIVATEKEY=$GITHUB_SSH_PRIVATEKEY" -t go-api-skeleton-release:$CI_COMMIT_REF_SLUG .
-    - docker run --rm go-api-skeleton-release:$CI_COMMIT_REF_SLUG bash -c 'eval $(ssh-agent -s) && echo "${GITHUB_SSH_PRIVATEKEY}" | ssh-add - > /dev/null && make release'
+    - docker build -f Dockerfile.release --build-arg "GITHUB_ACCOUNT=$GITHUB_ACCOUNT" --build-arg "GITHUB_MAIL=$GITHUB_MAIL" --build-arg "GITHUB_SSH_PRIVATEKEY=$GITHUB_SSH_PRIVATEKEY" -t turbine-go-api-skeleton-release:$CI_COMMIT_REF_SLUG .
+    - docker run --rm turbine-go-api-skeleton-release:$CI_COMMIT_REF_SLUG bash -c 'eval $(ssh-agent -s) && echo "${GITHUB_SSH_PRIVATEKEY}" | ssh-add - > /dev/null && make release'
     - git pull
     - VERSION=$(git describe --tags --abbrev=0)
     - docker build -t $RELEASE_CONTAINER_IMAGE:$VERSION .

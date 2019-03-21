@@ -1,4 +1,4 @@
-module github.com/adeo/go-api-skeleton
+module github.com/adeo/turbine-go-api-skeleton
 
 require (
 	github.com/allegro/bigcache v1.2.0

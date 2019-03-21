@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/adeo/go-api-skeleton/storage/dao"
-	"github.com/adeo/go-api-skeleton/storage/model"
-	"github.com/adeo/go-api-skeleton/storage/validators"
-	"github.com/adeo/go-api-skeleton/utils"
+	"github.com/adeo/turbine-go-api-skeleton/storage/dao"
+	"github.com/adeo/turbine-go-api-skeleton/storage/model"
+	"github.com/adeo/turbine-go-api-skeleton/storage/validators"
+	"github.com/adeo/turbine-go-api-skeleton/utils"
 	"github.com/gin-gonic/gin"
 )
 

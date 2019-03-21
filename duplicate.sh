@@ -2,7 +2,7 @@
 
 
 OLD_PROJECT_NAMESPACE="github.com/adeo"
-OLD_PROJECT_NAME="go-api-skeleton"
+OLD_PROJECT_NAME="turbine-go-api-skeleton"
 OLD_PROJECT_FULL_NAME="${OLD_PROJECT_NAMESPACE}/${OLD_PROJECT_NAME}"
 OLD_PROJECT_GROUP="go-group-skeleton"
 

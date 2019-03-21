@@ -19,7 +19,7 @@ deps: ## get the golang dependencies in the vendor folder
 
 .PHONY: build
 build: ##  build the executable and set the version
-	go build -o go-api-skeleton -ldflags "-X github.com/adeo/go-api-skeleton/handlers.ApplicationVersion=$(VERSION) -X github.com/adeo/go-api-skeleton/handlers.ApplicationName=$(NAME)" main.go
+	go build -o turbine-go-api-skeleton -ldflags "-X github.com/adeo/turbine-go-api-skeleton/handlers.ApplicationVersion=$(VERSION) -X github.com/adeo/turbine-go-api-skeleton/handlers.ApplicationName=$(NAME)" main.go
 
 .PHONY: test
 test: ## run go test

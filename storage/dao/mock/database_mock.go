@@ -1,7 +1,7 @@
 package mock
 
 import (
-	"github.com/adeo/go-api-skeleton/storage/dao"
+	"github.com/adeo/turbine-go-api-skeleton/storage/dao"
 	"github.com/stretchr/testify/mock"
 )
 

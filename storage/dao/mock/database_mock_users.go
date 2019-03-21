@@ -1,7 +1,7 @@
 package mock
 
 import (
-	"github.com/adeo/go-api-skeleton/storage/model"
+	"github.com/adeo/turbine-go-api-skeleton/storage/model"
 )
 
 func (db *DatabaseMock) GetAllUsers() ([]*model.User, error) {
