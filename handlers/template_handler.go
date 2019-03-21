@@ -167,7 +167,7 @@ func (hc *Context) GetTemplate(c *gin.Context) {
 		return
 	}
 
-	template, err := hc.db.GetTemplatesByID(templateID)
+	template, err := hc.db.GetTemplateByID(templateID)
 	if e, ok := err.(*dao.DAOError); ok {
 		switch {
 		case e.Type == dao.ErrTypeNotFound:
@@ -230,7 +230,7 @@ func (hc *Context) DeleteTemplate(c *gin.Context) {
 	}
 
 	// check template id given in URL exists
-	_, err = hc.db.GetTemplatesByID(templateID)
+	_, err = hc.db.GetTemplateByID(templateID)
 	if e, ok := err.(*dao.DAOError); ok {
 		switch {
 		case e.Type == dao.ErrTypeNotFound:
@@ -322,7 +322,7 @@ func (hc *Context) UpdateTemplate(c *gin.Context) {
 	}
 
 	// check template id given in URL exists
-	template, err := hc.db.GetTemplatesByID(templateID)
+	template, err := hc.db.GetTemplateByID(templateID)
 	if e, ok := err.(*dao.DAOError); ok {
 		switch {
 		case e.Type == dao.ErrTypeNotFound:

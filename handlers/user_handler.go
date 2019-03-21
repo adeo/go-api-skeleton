@@ -167,7 +167,7 @@ func (hc *Context) GetUser(c *gin.Context) {
 		return
 	}
 
-	user, err := hc.db.GetUsersByID(userID)
+	user, err := hc.db.GetUserByID(userID)
 	if e, ok := err.(*dao.DAOError); ok {
 		switch {
 		case e.Type == dao.ErrTypeNotFound:
@@ -230,7 +230,7 @@ func (hc *Context) DeleteUser(c *gin.Context) {
 	}
 
 	// check user id given in URL exists
-	_, err = hc.db.GetUsersByID(userID)
+	_, err = hc.db.GetUserByID(userID)
 	if e, ok := err.(*dao.DAOError); ok {
 		switch {
 		case e.Type == dao.ErrTypeNotFound:
@@ -322,7 +322,7 @@ func (hc *Context) UpdateUser(c *gin.Context) {
 	}
 
 	// check user id given in URL exists
-	user, err := hc.db.GetUsersByID(userID)
+	user, err := hc.db.GetUserByID(userID)
 	if e, ok := err.(*dao.DAOError); ok {
 		switch {
 		case e.Type == dao.ErrTypeNotFound:
