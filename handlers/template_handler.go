@@ -8,6 +8,7 @@ import (
 	"github.com/adeo/turbine-go-api-skeleton/storage/model"
 	"github.com/adeo/turbine-go-api-skeleton/storage/validators"
 	"github.com/adeo/turbine-go-api-skeleton/utils"
+	"github.com/adeo/turbine-go-api-skeleton/utils/httputils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -36,10 +37,10 @@ func (hc *Context) GetAllTemplates(c *gin.Context) {
 	templates, err := hc.db.GetAllTemplates()
 	if err != nil {
 		utils.GetLoggerFromCtx(c).WithError(err).Error("error while getting templates")
-		utils.JSONErrorWithMessage(c.Writer, model.ErrInternalServer, "Error while getting templates")
+		httputils.JSONErrorWithMessage(c.Writer, model.ErrInternalServer, "Error while getting templates")
 		return
 	}
-	utils.JSON(c.Writer, http.StatusOK, templates)
+	httputils.JSON(c.Writer, http.StatusOK, templates)
 }
 
 // @openapi:path
@@ -84,20 +85,20 @@ func (hc *Context) CreateTemplate(c *gin.Context) {
 	b, err := c.GetRawData()
 	if err != nil {
 		utils.GetLoggerFromCtx(c).WithError(err).Error("error while creating template, read data fail")
-		utils.JSONError(c.Writer, model.ErrInternalServer)
+		httputils.JSONError(c.Writer, model.ErrInternalServer)
 		return
 	}
 
 	templateToCreate := model.TemplateEditable{}
 	err = json.Unmarshal(b, &templateToCreate)
 	if err != nil {
-		utils.JSONError(c.Writer, model.ErrBadRequestFormat)
+		httputils.JSONError(c.Writer, model.ErrBadRequestFormat)
 		return
 	}
 
 	err = hc.validator.StructCtx(c, templateToCreate)
 	if err != nil {
-		utils.JSONError(c.Writer, validators.NewDataValidationAPIError(err))
+		httputils.JSONError(c.Writer, validators.NewDataValidationAPIError(err))
 		return
 	}
 
@@ -109,20 +110,20 @@ func (hc *Context) CreateTemplate(c *gin.Context) {
 	if e, ok := err.(*dao.DAOError); ok {
 		switch {
 		case e.Type == dao.ErrTypeDuplicate:
-			utils.JSONErrorWithMessage(c.Writer, model.ErrAlreadyExists, "Template already exists")
+			httputils.JSONErrorWithMessage(c.Writer, model.ErrAlreadyExists, "Template already exists")
 			return
 		default:
 			utils.GetLoggerFromCtx(c).WithError(err).WithField("type", e.Type).Error("error CreateTemplate: Error type not handled")
-			utils.JSONError(c.Writer, model.ErrInternalServer)
+			httputils.JSONError(c.Writer, model.ErrInternalServer)
 			return
 		}
 	} else if err != nil {
 		utils.GetLoggerFromCtx(c).WithError(err).Error("error while creating template")
-		utils.JSONError(c.Writer, model.ErrInternalServer)
+		httputils.JSONError(c.Writer, model.ErrInternalServer)
 		return
 	}
 
-	utils.JSON(c.Writer, http.StatusCreated, template)
+	httputils.JSON(c.Writer, http.StatusCreated, template)
 }
 
 // @openapi:path
@@ -162,7 +163,7 @@ func (hc *Context) GetTemplate(c *gin.Context) {
 
 	err := hc.validator.VarCtx(c, templateID, "required")
 	if err != nil {
-		utils.JSONError(c.Writer, validators.NewDataValidationAPIError(err))
+		httputils.JSONError(c.Writer, validators.NewDataValidationAPIError(err))
 		return
 	}
 
@@ -170,25 +171,25 @@ func (hc *Context) GetTemplate(c *gin.Context) {
 	if e, ok := err.(*dao.DAOError); ok {
 		switch {
 		case e.Type == dao.ErrTypeNotFound:
-			utils.JSONErrorWithMessage(c.Writer, model.ErrNotFound, "Template not found")
+			httputils.JSONErrorWithMessage(c.Writer, model.ErrNotFound, "Template not found")
 			return
 		default:
 			utils.GetLoggerFromCtx(c).WithError(err).WithField("type", e.Type).Error("error GetTemplate: get template error type not handled")
-			utils.JSONError(c.Writer, model.ErrInternalServer)
+			httputils.JSONError(c.Writer, model.ErrInternalServer)
 			return
 		}
 	} else if err != nil {
 		utils.GetLoggerFromCtx(c).WithError(err).Error("error while get template")
-		utils.JSONError(c.Writer, model.ErrInternalServer)
+		httputils.JSONError(c.Writer, model.ErrInternalServer)
 		return
 	}
 
 	if template == nil {
-		utils.JSONErrorWithMessage(c.Writer, model.ErrNotFound, "Template not found")
+		httputils.JSONErrorWithMessage(c.Writer, model.ErrNotFound, "Template not found")
 		return
 	}
 
-	utils.JSON(c.Writer, http.StatusOK, template)
+	httputils.JSON(c.Writer, http.StatusOK, template)
 }
 
 // @openapi:path
@@ -224,7 +225,7 @@ func (hc *Context) DeleteTemplate(c *gin.Context) {
 
 	err := hc.validator.VarCtx(c, templateID, "required")
 	if err != nil {
-		utils.JSONError(c.Writer, validators.NewDataValidationAPIError(err))
+		httputils.JSONError(c.Writer, validators.NewDataValidationAPIError(err))
 		return
 	}
 
@@ -233,16 +234,16 @@ func (hc *Context) DeleteTemplate(c *gin.Context) {
 	if e, ok := err.(*dao.DAOError); ok {
 		switch {
 		case e.Type == dao.ErrTypeNotFound:
-			utils.JSONErrorWithMessage(c.Writer, model.ErrNotFound, "Template to delete not found")
+			httputils.JSONErrorWithMessage(c.Writer, model.ErrNotFound, "Template to delete not found")
 			return
 		default:
 			utils.GetLoggerFromCtx(c).WithError(err).WithField("type", e.Type).Error("error DeleteTemplate: get template error type not handled")
-			utils.JSONError(c.Writer, model.ErrInternalServer)
+			httputils.JSONError(c.Writer, model.ErrInternalServer)
 			return
 		}
 	} else if err != nil {
 		utils.GetLoggerFromCtx(c).WithError(err).Error("error while get template to delete")
-		utils.JSONError(c.Writer, model.ErrInternalServer)
+		httputils.JSONError(c.Writer, model.ErrInternalServer)
 		return
 	}
 
@@ -250,20 +251,20 @@ func (hc *Context) DeleteTemplate(c *gin.Context) {
 	if e, ok := err.(*dao.DAOError); ok {
 		switch {
 		case e.Type == dao.ErrTypeNotFound:
-			utils.JSONErrorWithMessage(c.Writer, model.ErrNotFound, "Template to delete not found")
+			httputils.JSONErrorWithMessage(c.Writer, model.ErrNotFound, "Template to delete not found")
 			return
 		default:
 			utils.GetLoggerFromCtx(c).WithError(err).WithField("type", e.Type).Error("error DeleteTemplate: Error type not handled")
-			utils.JSONError(c.Writer, model.ErrInternalServer)
+			httputils.JSONError(c.Writer, model.ErrInternalServer)
 			return
 		}
 	} else if err != nil {
 		utils.GetLoggerFromCtx(c).WithError(err).Error("error while deleting template")
-		utils.JSONError(c.Writer, model.ErrInternalServer)
+		httputils.JSONError(c.Writer, model.ErrInternalServer)
 		return
 	}
 
-	utils.JSON(c.Writer, http.StatusNoContent, nil)
+	httputils.JSON(c.Writer, http.StatusNoContent, nil)
 }
 
 // @openapi:path
@@ -316,7 +317,7 @@ func (hc *Context) UpdateTemplate(c *gin.Context) {
 
 	err := hc.validator.VarCtx(c, templateID, "required")
 	if err != nil {
-		utils.JSONError(c.Writer, validators.NewDataValidationAPIError(err))
+		httputils.JSONError(c.Writer, validators.NewDataValidationAPIError(err))
 		return
 	}
 
@@ -325,16 +326,16 @@ func (hc *Context) UpdateTemplate(c *gin.Context) {
 	if e, ok := err.(*dao.DAOError); ok {
 		switch {
 		case e.Type == dao.ErrTypeNotFound:
-			utils.JSONErrorWithMessage(c.Writer, model.ErrNotFound, "Template to update not found")
+			httputils.JSONErrorWithMessage(c.Writer, model.ErrNotFound, "Template to update not found")
 			return
 		default:
 			utils.GetLoggerFromCtx(c).WithError(err).WithField("type", e.Type).Error("UpdateTemplate: get template error type not handled")
-			utils.JSONError(c.Writer, model.ErrInternalServer)
+			httputils.JSONError(c.Writer, model.ErrInternalServer)
 			return
 		}
 	} else if err != nil {
 		utils.GetLoggerFromCtx(c).WithError(err).Error("error while get template to update")
-		utils.JSONError(c.Writer, model.ErrInternalServer)
+		httputils.JSONError(c.Writer, model.ErrInternalServer)
 		return
 	}
 
@@ -342,20 +343,20 @@ func (hc *Context) UpdateTemplate(c *gin.Context) {
 	b, err := c.GetRawData()
 	if err != nil {
 		utils.GetLoggerFromCtx(c).WithError(err).Error("error while updating template, read data fail")
-		utils.JSONError(c.Writer, model.ErrInternalServer)
+		httputils.JSONError(c.Writer, model.ErrInternalServer)
 		return
 	}
 
 	templateToUpdate := model.TemplateEditable{}
 	err = json.Unmarshal(b, &templateToUpdate)
 	if err != nil {
-		utils.JSONError(c.Writer, model.ErrBadRequestFormat)
+		httputils.JSONError(c.Writer, model.ErrBadRequestFormat)
 		return
 	}
 
 	err = hc.validator.StructCtx(c, templateToUpdate)
 	if err != nil {
-		utils.JSONError(c.Writer, validators.NewDataValidationAPIError(err))
+		httputils.JSONError(c.Writer, validators.NewDataValidationAPIError(err))
 		return
 	}
 
@@ -366,18 +367,18 @@ func (hc *Context) UpdateTemplate(c *gin.Context) {
 	if e, ok := err.(*dao.DAOError); ok {
 		switch {
 		case e.Type == dao.ErrTypeNotFound:
-			utils.JSONErrorWithMessage(c.Writer, model.ErrNotFound, "Template to update not found")
+			httputils.JSONErrorWithMessage(c.Writer, model.ErrNotFound, "Template to update not found")
 			return
 		default:
 			utils.GetLoggerFromCtx(c).WithError(err).WithField("type", e.Type).Error("error UpdateTemplate: Error type not handled")
-			utils.JSONError(c.Writer, model.ErrInternalServer)
+			httputils.JSONError(c.Writer, model.ErrInternalServer)
 			return
 		}
 	} else if err != nil {
 		utils.GetLoggerFromCtx(c).WithError(err).Error("error while updating template")
-		utils.JSONError(c.Writer, model.ErrInternalServer)
+		httputils.JSONError(c.Writer, model.ErrInternalServer)
 		return
 	}
 
-	utils.JSON(c.Writer, http.StatusOK, template)
+	httputils.JSON(c.Writer, http.StatusOK, template)
 }

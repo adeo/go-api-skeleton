@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"net/http"
 	"reflect"
 	"strings"
@@ -13,6 +14,7 @@ import (
 	"github.com/adeo/turbine-go-api-skeleton/storage/dao/postgresql"
 	"github.com/adeo/turbine-go-api-skeleton/storage/validators"
 	"github.com/adeo/turbine-go-api-skeleton/utils"
+	"github.com/adeo/turbine-go-api-skeleton/utils/httputils"
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"gopkg.in/go-playground/validator.v9"
@@ -50,6 +52,7 @@ func NewHandlersContext(config *Config) *Context {
 	} else if strings.HasPrefix(config.DBConnectionURI, "mongodb://") {
 		hc.db = mongodb.NewDatabaseMongoDB(config.DBConnectionURI, config.DBName)
 	} else {
+		utils.GetLogger().Warn("no db connection uri given or not handled, starting in mode db in memory")
 		hc.db = fake.NewDatabaseFake()
 	}
 	hc.validator = newValidator()
@@ -70,11 +73,11 @@ func NewMonitoringRouter(hc *Context) *gin.Engine {
 	public.Use(middlewares.CORSMiddlewareForOthersHTTPMethods())
 
 	public.Handle(http.MethodGet, "/_health", hc.GetHealth)
-	public.Handle(http.MethodOptions, "/_health", hc.GetOptionsHandler(utils.AllowedHeaders, http.MethodGet))
+	public.Handle(http.MethodOptions, "/_health", hc.GetOptionsHandler(httputils.AllowedHeaders, http.MethodGet))
 	public.Handle(http.MethodGet, "/openapi", hc.GetOpenAPISchema)
-	public.Handle(http.MethodOptions, "/openapi", hc.GetOptionsHandler(utils.AllowedHeaders, http.MethodGet))
+	public.Handle(http.MethodOptions, "/openapi", hc.GetOptionsHandler(httputils.AllowedHeaders, http.MethodGet))
 	public.Handle(http.MethodGet, "/prometheus", gin.WrapH(promhttp.Handler()))
-	public.Handle(http.MethodOptions, "/prometheus", hc.GetOptionsHandler(utils.AllowedHeaders, http.MethodGet))
+	public.Handle(http.MethodOptions, "/prometheus", hc.GetOptionsHandler(httputils.AllowedHeaders, http.MethodGet))
 
 	return router
 }
@@ -94,19 +97,19 @@ func NewAPIRouter(hc *Context) *gin.Engine {
 	public.Use(middlewares.CORSMiddlewareForOthersHTTPMethods())
 
 	// start: user routes
-	public.Handle(http.MethodOptions, "/users", hc.GetOptionsHandler(utils.AllowedHeaders, http.MethodGet, http.MethodPost))
+	public.Handle(http.MethodOptions, "/users", hc.GetOptionsHandler(httputils.AllowedHeaders, http.MethodGet, http.MethodPost))
 	public.Handle(http.MethodGet, "/users", hc.GetAllUsers)
 	public.Handle(http.MethodPost, "/users", hc.CreateUser)
-	public.Handle(http.MethodOptions, "/users/:id", hc.GetOptionsHandler(utils.AllowedHeaders, http.MethodGet, http.MethodPut, http.MethodDelete))
+	public.Handle(http.MethodOptions, "/users/:id", hc.GetOptionsHandler(httputils.AllowedHeaders, http.MethodGet, http.MethodPut, http.MethodDelete))
 	public.Handle(http.MethodGet, "/users/:id", hc.GetUser)
 	public.Handle(http.MethodPut, "/users/:id", hc.UpdateUser)
 	public.Handle(http.MethodDelete, "/users/:id", hc.DeleteUser)
 	// end: user routes
 	// start: template routes
-	public.Handle(http.MethodOptions, "/templates", hc.GetOptionsHandler(utils.AllowedHeaders, http.MethodGet, http.MethodPost))
+	public.Handle(http.MethodOptions, "/templates", hc.GetOptionsHandler(httputils.AllowedHeaders, http.MethodGet, http.MethodPost))
 	public.Handle(http.MethodGet, "/templates", hc.GetAllTemplates)
 	public.Handle(http.MethodPost, "/templates", hc.CreateTemplate)
-	public.Handle(http.MethodOptions, "/templates/:id", hc.GetOptionsHandler(utils.AllowedHeaders, http.MethodGet, http.MethodPut, http.MethodDelete))
+	public.Handle(http.MethodOptions, "/templates/:id", hc.GetOptionsHandler(httputils.AllowedHeaders, http.MethodGet, http.MethodPut, http.MethodDelete))
 	public.Handle(http.MethodGet, "/templates/:id", hc.GetTemplate)
 	public.Handle(http.MethodPut, "/templates/:id", hc.UpdateTemplate)
 	public.Handle(http.MethodDelete, "/templates/:id", hc.DeleteTemplate)
@@ -133,4 +136,11 @@ func newValidator() *validator.Validate {
 	}
 
 	return va
+}
+
+func (hc *Context) getValidationContext(c *gin.Context) context.Context {
+	vc := &validators.ValidationContext{
+		DB: hc.db,
+	}
+	return context.WithValue(c, validators.ContextKeyValidator, vc)
 }
