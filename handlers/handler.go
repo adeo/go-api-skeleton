@@ -8,8 +8,8 @@ import (
 
 	"github.com/adeo/turbine-go-api-skeleton/middlewares"
 	"github.com/adeo/turbine-go-api-skeleton/storage/dao"
-	"github.com/adeo/turbine-go-api-skeleton/storage/dao/fake"
-	"github.com/adeo/turbine-go-api-skeleton/storage/dao/mock"
+	dbFake "github.com/adeo/turbine-go-api-skeleton/storage/dao/fake"
+	dbMock "github.com/adeo/turbine-go-api-skeleton/storage/dao/mock"
 	"github.com/adeo/turbine-go-api-skeleton/storage/dao/mongodb"
 	"github.com/adeo/turbine-go-api-skeleton/storage/dao/postgresql"
 	"github.com/adeo/turbine-go-api-skeleton/storage/validators"
@@ -26,14 +26,15 @@ var (
 )
 
 type Config struct {
-	Mock            bool
-	DBInMemory      bool
-	DBConnectionURI string
-	DBName          string
-	PortAPI         int
-	PortMonitoring  int
-	LogLevel        string
-	LogFormat       string
+	Mock                 bool
+	DBInMemory           bool
+	DBInMemoryImportFile string
+	DBConnectionURI      string
+	DBName               string
+	PortAPI              int
+	PortMonitoring       int
+	LogLevel             string
+	LogFormat            string
 }
 
 type Context struct {
@@ -44,16 +45,16 @@ type Context struct {
 func NewHandlersContext(config *Config) *Context {
 	hc := &Context{}
 	if config.Mock {
-		hc.db = mock.NewDatabaseMock()
+		hc.db = dbMock.NewDatabaseMock()
 	} else if config.DBInMemory {
-		hc.db = fake.NewDatabaseFake()
+		hc.db = dbFake.NewDatabaseFake(config.DBInMemoryImportFile)
 	} else if strings.HasPrefix(config.DBConnectionURI, "postgresql://") {
 		hc.db = postgresql.NewDatabasePostgreSQL(config.DBConnectionURI)
 	} else if strings.HasPrefix(config.DBConnectionURI, "mongodb://") {
 		hc.db = mongodb.NewDatabaseMongoDB(config.DBConnectionURI, config.DBName)
 	} else {
-		utils.GetLogger().Warn("no db connection uri given or not handled, starting in mode db in memory")
-		hc.db = fake.NewDatabaseFake()
+		utils.GetLogger().Fatal("no db connection uri given or not handled, starting in mode db in memory")
+		hc.db = dbFake.NewDatabaseFake(config.DBInMemoryImportFile)
 	}
 	hc.validator = newValidator()
 	return hc
@@ -72,12 +73,19 @@ func NewMonitoringRouter(hc *Context) *gin.Engine {
 	public := router.Group("/")
 	public.Use(middlewares.CORSMiddlewareForOthersHTTPMethods())
 
-	public.Handle(http.MethodGet, "/_health", hc.GetHealth)
-	public.Handle(http.MethodOptions, "/_health", hc.GetOptionsHandler(httputils.AllowedHeaders, http.MethodGet))
+	public.Handle(http.MethodGet, "/info", hc.GetInfo)
+	public.Handle(http.MethodOptions, "/info", hc.GetOptionsHandler(httputils.AllowedHeaders, http.MethodGet))
 	public.Handle(http.MethodGet, "/openapi", hc.GetOpenAPISchema)
 	public.Handle(http.MethodOptions, "/openapi", hc.GetOptionsHandler(httputils.AllowedHeaders, http.MethodGet))
 	public.Handle(http.MethodGet, "/prometheus", gin.WrapH(promhttp.Handler()))
 	public.Handle(http.MethodOptions, "/prometheus", hc.GetOptionsHandler(httputils.AllowedHeaders, http.MethodGet))
+
+	if dbInMemory, ok := hc.db.(*dbFake.DatabaseFake); ok {
+		// db in memory mode, add export endpoint
+		public.Handle(http.MethodGet, "/export", func(c *gin.Context) {
+			httputils.JSON(c.Writer, http.StatusOK, dbInMemory.Export())
+		})
+	}
 
 	return router
 }

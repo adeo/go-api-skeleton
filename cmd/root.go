@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/adeo/turbine-go-api-skeleton/handlers"
 	"github.com/adeo/turbine-go-api-skeleton/utils"
@@ -17,23 +18,25 @@ var (
 )
 
 const (
-	parameterConfigurationFile = "config"
-	parameterLogLevel          = "loglevel"
-	parameterLogFormat         = "logformat"
-	parameterDBConnectionURI   = "dbconnectionuri"
-	parameterDBInMemory        = "dbinmemory"
-	parameterDBName            = "dbname"
-	parameterPortAPI           = "portapi"
-	parameterPortMonitoring    = "portmonitoring"
+	parameterConfigurationFile    = "config"
+	parameterLogLevel             = "log-level"
+	parameterLogFormat            = "log-format"
+	parameterDBConnectionURI      = "db-connection-uri"
+	parameterDBInMemory           = "db-in-memory"
+	parameterDBInMemoryImportFile = "db-in-memory-import-file"
+	parameterDBName               = "db-name"
+	parameterPortAPI              = "port-api"
+	parameterPortMonitoring       = "port-monitoring"
 )
 
 var (
-	defaultLogLevel        = logrus.WarnLevel.String()
-	defaultLogFormat       = utils.LogFormatText
-	defaultDBConnectionURI = ""
-	defaultDBName          = ""
-	defaultPortAPI         = 8080
-	defaultPortMonitoring  = 8081
+	defaultLogLevel             = logrus.WarnLevel.String()
+	defaultLogFormat            = utils.LogFormatText
+	defaultDBInMemoryImportFile = ""
+	defaultDBConnectionURI      = ""
+	defaultDBName               = ""
+	defaultPortAPI              = 8080
+	defaultPortMonitoring       = 8081
 )
 
 var rootCmd = &cobra.Command{
@@ -48,7 +51,8 @@ var rootCmd = &cobra.Command{
 			WithField(parameterLogFormat, config.LogFormat).
 			WithField(parameterPortAPI, config.PortAPI).
 			WithField(parameterPortMonitoring, config.PortMonitoring).
-			WithField(parameterDBInMemory, config.Mock).
+			WithField(parameterDBInMemory, config.DBInMemory).
+			WithField(parameterDBInMemoryImportFile, config.DBInMemoryImportFile).
 			WithField(parameterDBConnectionURI, config.DBConnectionURI).
 			WithField(parameterDBName, config.DBName).
 			Warn("Configuration")
@@ -98,6 +102,10 @@ func init() {
 
 	rootCmd.Flags().Bool(parameterDBInMemory, false, "Use this flag to enable the db in memory mode")
 	_ = viper.BindPFlag(parameterDBInMemory, rootCmd.Flags().Lookup(parameterDBInMemory))
+
+	rootCmd.Flags().String(parameterDBInMemoryImportFile, defaultDBInMemoryImportFile, "Use this flag to import a dataset in db in memory mode")
+	_ = viper.BindPFlag(parameterDBInMemoryImportFile, rootCmd.Flags().Lookup(parameterDBInMemoryImportFile))
+
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -108,6 +116,9 @@ func initConfig() {
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match
+
+	dashReplacer := strings.NewReplacer("-", "_")
+	viper.SetEnvKeyReplacer(dashReplacer)
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
@@ -121,4 +132,5 @@ func initConfig() {
 	config.DBConnectionURI = viper.GetString(parameterDBConnectionURI)
 	config.DBName = viper.GetString(parameterDBName)
 	config.DBInMemory = viper.GetBool(parameterDBInMemory)
+	config.DBInMemoryImportFile = viper.GetString(parameterDBInMemoryImportFile)
 }

@@ -7,6 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (hc *Context) GetHealth(c *gin.Context) {
+func (hc *Context) GetInfo(c *gin.Context) {
 	httputils.JSON(c.Writer, http.StatusNoContent, nil)
 }
