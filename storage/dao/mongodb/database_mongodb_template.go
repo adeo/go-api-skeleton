@@ -15,7 +15,7 @@ func (db *DatabaseMongoDB) GetAllTemplates() ([]*model.Template, error) {
 	ctx := db.getCtx()
 	cur, err := db.getSession().Collection("template").Find(ctx, bson.D{})
 	if err != nil {
-		utils.GetLogger().WithError(err).Fatal("Unable to get all templates")
+		return nil, err
 	}
 	defer cur.Close(ctx)
 

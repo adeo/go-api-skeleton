@@ -21,8 +21,10 @@ import (
 )
 
 var (
-	ApplicationName    = ""
-	ApplicationVersion = "dev"
+	ApplicationName      = ""
+	ApplicationVersion   = "dev"
+	ApplicationGitHash   = ""
+	ApplicationBuildDate = ""
 )
 
 type Config struct {
