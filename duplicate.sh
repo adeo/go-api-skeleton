@@ -34,7 +34,7 @@ main()
         echo "Creating a new entity:"
         echo "What is the entity name you want to create? (name to be u$SED_CMD in URL path, write it lower case, singular)"
         read ENTITY_NAME
-        ENTITY_NAME_UP=$(echo $ENTITY_NAME | tr  '[:upper:]' '[:lower:]')
+        ENTITY_NAME_UP="$(tr '[:lower:]' '[:upper:]' <<< ${ENTITY_NAME:0:1})${ENTITY_NAME:1}"
 
         echo "What is the postgresql schema to use for this entity? (if you plan to use MongoDB you can ignore this question)"
         read ENTITY_SCHEMA
