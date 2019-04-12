@@ -67,7 +67,7 @@ main()
 
         $SED_CMD -i -r "/\/\/ start: template dao funcs/{:next;N;/\/\/ end: template dao funcs/{bend};bnext;:end;p;s|template|${ENTITY_NAME}|g;s|Template|${ENTITY_NAME_UP}|g}" storage/dao/database.go
 
-        $SED_CMD -i -r "/\/\/ template export/{p;s/Template/${ENTITY_NAME}/g}" storage/dao/fake/database_fake.go
+        $SED_CMD -i -r "/\/\/ Template export/{p;s/Template/${ENTITY_NAME}/g}" storage/dao/fake/database_fake.go
 
         echo "Done"
         echo "If you want to stop here, hit Ctrl+C"
