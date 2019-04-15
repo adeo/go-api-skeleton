@@ -21,7 +21,7 @@ import (
 )
 
 const (
-	baseURI = "/"
+	baseURI = ""
 )
 
 var (

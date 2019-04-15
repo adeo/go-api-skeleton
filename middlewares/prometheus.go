@@ -14,6 +14,8 @@ var (
 
 const (
 	latencyName = "http_server_requests_seconds"
+
+	ContextKeyPrometheusURI = "prometheus_route"
 )
 
 type PrometheusMiddleware struct {
@@ -45,6 +47,11 @@ func (m *PrometheusMiddleware) Handler() gin.HandlerFunc {
 
 		c.Next()
 
-		m.latency.WithLabelValues(strconv.Itoa(c.Writer.Status()), c.Request.Method, c.Request.URL.Path).Observe(time.Since(start).Seconds())
+		route := c.Request.URL.Path
+		if v, ok := c.Get(ContextKeyPrometheusURI); ok {
+			route = v.(string)
+		}
+
+		m.latency.WithLabelValues(strconv.Itoa(c.Writer.Status()), c.Request.Method, route).Observe(time.Since(start).Seconds())
 	}
 }

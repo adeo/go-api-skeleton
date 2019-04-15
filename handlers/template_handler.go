@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/adeo/turbine-go-api-skeleton/middlewares"
 	"github.com/adeo/turbine-go-api-skeleton/storage/dao"
 	"github.com/adeo/turbine-go-api-skeleton/storage/model"
 	"github.com/adeo/turbine-go-api-skeleton/storage/validators"
@@ -159,6 +160,8 @@ func (hc *Context) CreateTemplate(c *gin.Context) {
 //						schema:
 //							$ref: "#/components/schemas/APIError"
 func (hc *Context) GetTemplate(c *gin.Context) {
+	c.Set(middlewares.ContextKeyPrometheusURI, baseURI+"/templates/:id")
+
 	templateID := c.Param("id")
 
 	err := hc.validator.VarCtx(c, templateID, "required")
@@ -221,6 +224,8 @@ func (hc *Context) GetTemplate(c *gin.Context) {
 //						schema:
 //							$ref: "#/components/schemas/APIError"
 func (hc *Context) DeleteTemplate(c *gin.Context) {
+	c.Set(middlewares.ContextKeyPrometheusURI, baseURI+"/templates/:id")
+
 	templateID := c.Param("id")
 
 	err := hc.validator.VarCtx(c, templateID, "required")
@@ -313,6 +318,8 @@ func (hc *Context) DeleteTemplate(c *gin.Context) {
 //						schema:
 //							$ref: "#/components/schemas/APIError"
 func (hc *Context) UpdateTemplate(c *gin.Context) {
+	c.Set(middlewares.ContextKeyPrometheusURI, baseURI+"/templates/:id")
+
 	templateID := c.Param("id")
 
 	err := hc.validator.VarCtx(c, templateID, "required")
