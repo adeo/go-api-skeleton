@@ -22,8 +22,8 @@ const (
 	parameterLogLevel             = "log-level"
 	parameterLogFormat            = "log-format"
 	parameterDBConnectionURI      = "db-connection-uri"
-	parameterDBInMemory           = "db-in-memory"
-	parameterDBInMemoryImportFile = "db-in-memory-import-file"
+	parameterDBInMemory           = "db-in-memory"             // DAO IN MEMORY
+	parameterDBInMemoryImportFile = "db-in-memory-import-file" // DAO IN MEMORY
 	parameterDBName               = "db-name"
 	parameterPortAPI              = "port-api"
 	parameterPortMonitoring       = "port-monitoring"
@@ -32,7 +32,7 @@ const (
 var (
 	defaultLogLevel             = logrus.WarnLevel.String()
 	defaultLogFormat            = utils.LogFormatText
-	defaultDBInMemoryImportFile = ""
+	defaultDBInMemoryImportFile = "" // DAO IN MEMORY
 	defaultDBConnectionURI      = ""
 	defaultDBName               = ""
 	defaultPortAPI              = 8080
@@ -51,8 +51,8 @@ var rootCmd = &cobra.Command{
 			WithField(parameterLogFormat, config.LogFormat).
 			WithField(parameterPortAPI, config.PortAPI).
 			WithField(parameterPortMonitoring, config.PortMonitoring).
-			WithField(parameterDBInMemory, config.DBInMemory).
-			WithField(parameterDBInMemoryImportFile, config.DBInMemoryImportFile).
+			WithField(parameterDBInMemory, config.DBInMemory).                     // DAO IN MEMORY
+			WithField(parameterDBInMemoryImportFile, config.DBInMemoryImportFile). // DAO IN MEMORY
 			WithField(parameterDBConnectionURI, config.DBConnectionURI).
 			WithField(parameterDBName, config.DBName).
 			Warn("Configuration")
@@ -100,12 +100,11 @@ func init() {
 	rootCmd.Flags().String(parameterDBName, defaultDBName, "Use this flag to set the db name. This parameter is used when using a MongoDB database")
 	_ = viper.BindPFlag(parameterDBName, rootCmd.Flags().Lookup(parameterDBName))
 
-	rootCmd.Flags().Bool(parameterDBInMemory, false, "Use this flag to enable the db in memory mode")
-	_ = viper.BindPFlag(parameterDBInMemory, rootCmd.Flags().Lookup(parameterDBInMemory))
+	rootCmd.Flags().Bool(parameterDBInMemory, false, "Use this flag to enable the db in memory mode") // DAO IN MEMORY
+	_ = viper.BindPFlag(parameterDBInMemory, rootCmd.Flags().Lookup(parameterDBInMemory))             // DAO IN MEMORY
 
-	rootCmd.Flags().String(parameterDBInMemoryImportFile, defaultDBInMemoryImportFile, "Use this flag to import a dataset in db in memory mode")
-	_ = viper.BindPFlag(parameterDBInMemoryImportFile, rootCmd.Flags().Lookup(parameterDBInMemoryImportFile))
-
+	rootCmd.Flags().String(parameterDBInMemoryImportFile, defaultDBInMemoryImportFile, "Use this flag to import a dataset in db in memory mode") // DAO IN MEMORY
+	_ = viper.BindPFlag(parameterDBInMemoryImportFile, rootCmd.Flags().Lookup(parameterDBInMemoryImportFile))                                    // DAO IN MEMORY
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -131,6 +130,6 @@ func initConfig() {
 	config.PortMonitoring = viper.GetInt(parameterPortMonitoring)
 	config.DBConnectionURI = viper.GetString(parameterDBConnectionURI)
 	config.DBName = viper.GetString(parameterDBName)
-	config.DBInMemory = viper.GetBool(parameterDBInMemory)
-	config.DBInMemoryImportFile = viper.GetString(parameterDBInMemoryImportFile)
+	config.DBInMemory = viper.GetBool(parameterDBInMemory)                       // DAO IN MEMORY
+	config.DBInMemoryImportFile = viper.GetString(parameterDBInMemoryImportFile) // DAO IN MEMORY
 }

@@ -9,11 +9,26 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/x/bsonx"
 )
 
 const (
 	collectionTemplateName = "template"
 )
+
+func (db *DatabaseMongoDB) populateTemplateIndexes() {
+	ctx := db.getCtx()
+	_, err := db.getSession().Collection(collectionTemplateName).Indexes().CreateOne(ctx, mongo.IndexModel{
+		Keys: bsonx.Doc{{Key: "name", Value: bsonx.Int32(1)}},
+		Options: &options.IndexOptions{
+			Unique: utils.NewBool(true),
+		},
+	})
+	if err != nil {
+		utils.GetLogger().WithError(err).Error("error while creating mongodb index")
+	}
+}
 
 func (db *DatabaseMongoDB) GetAllTemplates() ([]*model.Template, error) {
 	ctx := db.getCtx()
