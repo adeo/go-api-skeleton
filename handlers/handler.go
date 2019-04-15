@@ -52,12 +52,12 @@ func NewHandlersContext(config *Config) *Context {
 	hc := &Context{}
 	if config.Mock {
 		hc.db = dbMock.NewDatabaseMock()
-	} else if config.DBInMemory {
-		hc.db = dbFake.NewDatabaseFake(config.DBInMemoryImportFile)
-	} else if strings.HasPrefix(config.DBConnectionURI, "postgresql://") {
-		hc.db = postgresql.NewDatabasePostgreSQL(config.DBConnectionURI)
-	} else if strings.HasPrefix(config.DBConnectionURI, "mongodb://") {
-		hc.db = mongodb.NewDatabaseMongoDB(config.DBConnectionURI, config.DBName)
+	} else if config.DBInMemory { // DAO IN MEMORY
+		hc.db = dbFake.NewDatabaseFake(config.DBInMemoryImportFile) // DAO IN MEMORY
+	} else if strings.HasPrefix(config.DBConnectionURI, "postgresql://") { // DAO PG
+		hc.db = postgresql.NewDatabasePostgreSQL(config.DBConnectionURI) // DAO PG
+	} else if strings.HasPrefix(config.DBConnectionURI, "mongodb://") { // DAO MONGO
+		hc.db = mongodb.NewDatabaseMongoDB(config.DBConnectionURI, config.DBName) // DAO MONGO
 	} else {
 		utils.GetLogger().Fatal("no db connection uri given or not handled, and no db in memory mode enabled, exiting")
 	}
@@ -78,7 +78,7 @@ func NewMonitoringRouter(hc *Context) *gin.Engine {
 	public := router.Group("/")
 	public.Use(middlewares.CORSMiddlewareForOthersHTTPMethods())
 
-	public.Handle(http.MethodGet, "/_health", hc.GetInfo)
+	public.Handle(http.MethodGet, "/_health", hc.GetHealth)
 	public.Handle(http.MethodOptions, "/_health", hc.GetOptionsHandler(httputils.AllowedHeaders, http.MethodGet))
 	public.Handle(http.MethodGet, "/openapi", hc.GetOpenAPISchema)
 	public.Handle(http.MethodOptions, "/openapi", hc.GetOptionsHandler(httputils.AllowedHeaders, http.MethodGet))
@@ -124,9 +124,6 @@ func handleCORSRoutes(hc *Context, router *gin.Engine) {
 func handleAPIRoutes(hc *Context, router *gin.Engine) {
 	public := router.Group(baseURI)
 	public.Use(middlewares.CORSMiddlewareForOthersHTTPMethods())
-
-	public.Handle(http.MethodGet, "/_health", hc.GetHealth)
-	public.Handle(http.MethodGet, "/openapi", hc.GetOpenAPISchema)
 
 	secured := public.Group("/")
 	// you can add an authentication middleware here

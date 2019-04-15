@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (hc *Context) GetInfo(c *gin.Context) {
+func (hc *Context) GetHealth(c *gin.Context) {
 	conf := map[string]string{
 		"ApplicationName":      ApplicationName,
 		"ApplicationVersion":   ApplicationVersion,
