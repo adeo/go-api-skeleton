@@ -23,7 +23,7 @@ help: ## display this help
 
 .PHONY: start
 start: openapi ## start the application
-	go run main.go --config config/local.json
+	go run main.go
 
 .PHONY: start-offline
 start-offline: ## start the application in offline mode

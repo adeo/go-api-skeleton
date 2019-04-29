@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 
+	cfg "github.com/adeo/turbine-go-api-skeleton/config"
 	"github.com/adeo/turbine-go-api-skeleton/handlers"
 	"github.com/adeo/turbine-go-api-skeleton/utils"
 	"github.com/sirupsen/logrus"
@@ -115,6 +116,7 @@ func initConfig() {
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match
+	//viper.SetEnvPrefix("TURBINE") // you can customize env vars prefix here
 
 	dashReplacer := strings.NewReplacer("-", "_")
 	viper.SetEnvKeyReplacer(dashReplacer)
@@ -122,6 +124,17 @@ func initConfig() {
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
+	}
+
+	//Load configuration from Vault
+	err := cfg.LoadAppConfiguration(handlers.ApplicationName)
+	if err == nil {
+		//Put Vault configuration in Viper
+		for key, value := range cfg.VaultConfiguration {
+			viper.SetDefault(key, value)
+		}
+	} else {
+		utils.GetLogger().WithError(err).Error("error while loading vault configuration")
 	}
 
 	config.LogLevel = viper.GetString(parameterLogLevel)
