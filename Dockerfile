@@ -11,7 +11,12 @@ RUN make deps openapi test build
 
 # run
 FROM alpine:latest
-RUN apk --no-cache add ca-certificates
+
+RUN apk --no-cache add ca-certificates curl
 COPY --from=builder /go/src/github.com/adeo/turbine-go-api-skeleton/turbine-go-api-skeleton .
+
+RUN adduser -D -u 1001 runner
+USER 1001
+
 CMD ["/turbine-go-api-skeleton"]
 
