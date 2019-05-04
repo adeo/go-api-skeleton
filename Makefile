@@ -26,7 +26,7 @@ start: openapi ## start the application
 	go run main.go
 
 .PHONY: start-offline
-start-offline: ## start the application in offline mode
+start-offline: openapi ## start the application in offline mode
 	go run main.go --log-level debug --log-format text --db-in-memory
 
 .PHONY: deps
