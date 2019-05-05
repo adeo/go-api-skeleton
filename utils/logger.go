@@ -18,7 +18,7 @@ const (
 var (
 	logLevel                   = logrus.DebugLevel
 	logFormat logrus.Formatter = &logrus.TextFormatter{}
-	logOut    io.Writer
+	logOut    io.Writer        = os.Stdout
 )
 
 func InitLogger(ll, lf string) {
