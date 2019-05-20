@@ -23,11 +23,15 @@ help: ## display this help
 
 .PHONY: start
 start: openapi ## start the application
-	go run main.go
+	go run main.go --log-level debug --log-format text \
+		--db-connection-uri mongodb://turbine:turbine@localhost:27017/turbine --db-name turbine \
+		--authentication-service-uri https://turbine-bela6v-qa.apps.op.acp.adeo.com
 
 .PHONY: start-offline
 start-offline: openapi ## start the application in offline mode
-	go run main.go --log-level debug --log-format text --db-in-memory
+	go run main.go --log-level debug --log-format text \
+		--db-in-memory \
+		--authentication-service-fake
 
 .PHONY: deps
 deps: ## get the golang dependencies in the vendor folder
