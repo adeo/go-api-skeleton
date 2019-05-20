@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/adeo/turbine-go-api-skeleton/middlewares"
+	"github.com/adeo/turbine-go-api-skeleton/services/authentication"
 	"github.com/adeo/turbine-go-api-skeleton/storage/dao"
 	dbFake "github.com/adeo/turbine-go-api-skeleton/storage/dao/fake" // DAO IN MEMORY
 	dbMock "github.com/adeo/turbine-go-api-skeleton/storage/dao/mock"
@@ -32,24 +33,28 @@ var (
 )
 
 type Config struct {
-	Mock                 bool
-	DBInMemory           bool   // DAO IN MEMORY
-	DBInMemoryImportFile string // DAO IN MEMORY
-	DBConnectionURI      string
-	DBName               string
-	PortAPI              int
-	PortMonitoring       int
-	LogLevel             string
-	LogFormat            string
+	Mock                      bool
+	DBInMemory                bool   // DAO IN MEMORY
+	DBInMemoryImportFile      string // DAO IN MEMORY
+	DBConnectionURI           string
+	DBName                    string
+	PortAPI                   int
+	PortMonitoring            int
+	LogLevel                  string
+	LogFormat                 string
+	AuthenticationServiceFake bool
+	AuthenticationServiceURI  string
 }
 
 type Context struct {
-	db        dao.Database
-	validator *validator.Validate
+	db                    dao.Database
+	authenticationService authentication.Service
+	validator             *validator.Validate
 }
 
 func NewHandlersContext(config *Config) *Context {
 	hc := &Context{}
+
 	if config.Mock {
 		hc.db = dbMock.NewDatabaseMock()
 	} else if config.DBInMemory { // DAO IN MEMORY
@@ -61,6 +66,13 @@ func NewHandlersContext(config *Config) *Context {
 	} else {
 		utils.GetLogger().Fatal("no db connection uri given or not handled, and no db in memory mode enabled, exiting")
 	}
+
+	if config.AuthenticationServiceFake {
+		hc.authenticationService = authentication.NewServiceFake()
+	} else {
+		hc.authenticationService = authentication.NewServiceHTTP(config.AuthenticationServiceURI)
+	}
+
 	hc.validator = newValidator()
 	return hc
 }
@@ -126,7 +138,7 @@ func handleAPIRoutes(hc *Context, router *gin.Engine) {
 	public.Use(middlewares.CORSMiddlewareForOthersHTTPMethods())
 
 	secured := public.Group("/")
-	// you can add an authentication middleware here
+	secured.Use(middlewares.GetAuthenticationMiddleware(hc.authenticationService))
 
 	// start: template routes
 	secured.Handle(http.MethodGet, "/templates", hc.GetAllTemplates)

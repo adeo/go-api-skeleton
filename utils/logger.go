@@ -12,7 +12,8 @@ const (
 	LogFormatText = "text"
 	LogFormatJSON = "json"
 
-	ContextKeyLogger = "logger"
+	ContextKeyLogger         = "logger"
+	ContextKeyAuthIntrospect = "ContextKeyAuthIntrospect"
 )
 
 var (

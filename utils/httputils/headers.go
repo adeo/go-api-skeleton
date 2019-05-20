@@ -1,15 +1,16 @@
 package httputils
 
 const (
-	HeaderNameAccept        = "accept"
-	HeaderNameAuthorization = "authorization"
-	HeaderNameCacheControl  = "cache-control"
-	HeaderNameContentType   = "content-type"
-	HeaderNameCorrelationID = "correlationID"
-	HeaderNameETag          = "ETag"
-	HeaderNameExpires       = "expires"
-	HeaderNameIfMatch       = "If-Match"
-	HeaderNameLocation      = "location"
+	HeaderNameAccept          = "accept"
+	HeaderNameAuthorization   = "authorization"
+	HeaderNameCacheControl    = "cache-control"
+	HeaderNameContentType     = "content-type"
+	HeaderNameCorrelationID   = "correlationID"
+	HeaderNameETag            = "ETag"
+	HeaderNameExpires         = "expires"
+	HeaderNameIfMatch         = "If-Match"
+	HeaderNameLocation        = "location"
+	HeaderNameWWWAuthenticate = "WWW-Authenticate"
 
 	// cors headers
 	HeaderNameOrigin                        = "Origin"
