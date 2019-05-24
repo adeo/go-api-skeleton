@@ -27,7 +27,7 @@ func NewServiceHTTP(authenticationServiceURL string) Service {
 	}
 }
 
-func (s *ServiceHTTP) Introspect(c *gin.Context) (*IntrospectResponse, error) {
+func (s *ServiceHTTP) TokenIntrospect(c *gin.Context) (*TokenIntrospectionResponse, error) {
 	auth := c.GetHeader(httputils.HeaderNameAuthorization)
 	authSplitted := strings.SplitN(auth, " ", 2)
 	if len(authSplitted) != 2 {
@@ -60,7 +60,7 @@ func (s *ServiceHTTP) Introspect(c *gin.Context) (*IntrospectResponse, error) {
 	}
 
 	// build json result
-	result := &IntrospectResponse{}
+	result := &TokenIntrospectionResponse{}
 	if json.Unmarshal(bodyBytes, result) != nil {
 		return nil, errors.New(fmt.Sprintf("unable to parse the introspect result: %s", string(bodyBytes)))
 	}

@@ -19,15 +19,17 @@ var (
 )
 
 const (
-	parameterConfigurationFile    = "config"
-	parameterLogLevel             = "log-level"
-	parameterLogFormat            = "log-format"
-	parameterDBConnectionURI      = "db-connection-uri"
-	parameterDBInMemory           = "db-in-memory"             // DAO IN MEMORY
-	parameterDBInMemoryImportFile = "db-in-memory-import-file" // DAO IN MEMORY
-	parameterDBName               = "db-name"
-	parameterPortAPI              = "port-api"
-	parameterPortMonitoring       = "port-monitoring"
+	parameterConfigurationFile         = "config"
+	parameterLogLevel                  = "log-level"
+	parameterLogFormat                 = "log-format"
+	parameterDBConnectionURI           = "db-connection-uri"
+	parameterDBInMemory                = "db-in-memory"             // DAO IN MEMORY
+	parameterDBInMemoryImportFile      = "db-in-memory-import-file" // DAO IN MEMORY
+	parameterDBName                    = "db-name"
+	parameterPortAPI                   = "port-api"
+	parameterPortMonitoring            = "port-monitoring"
+	parameterAuthenticationServiceFake = "authentication-service-fake"
+	parameterAuthenticationServiceURI  = "authentication-service-uri"
 )
 
 var (
@@ -56,6 +58,8 @@ var rootCmd = &cobra.Command{
 			WithField(parameterDBInMemoryImportFile, config.DBInMemoryImportFile). // DAO IN MEMORY
 			WithField(parameterDBConnectionURI, config.DBConnectionURI).
 			WithField(parameterDBName, config.DBName).
+			WithField(parameterAuthenticationServiceFake, config.AuthenticationServiceFake).
+			WithField(parameterAuthenticationServiceURI, config.AuthenticationServiceURI).
 			Warn("Configuration")
 
 		hc := handlers.NewHandlersContext(config)
@@ -106,6 +110,12 @@ func init() {
 
 	rootCmd.Flags().String(parameterDBInMemoryImportFile, defaultDBInMemoryImportFile, "Use this flag to import a dataset in db in memory mode") // DAO IN MEMORY
 	_ = viper.BindPFlag(parameterDBInMemoryImportFile, rootCmd.Flags().Lookup(parameterDBInMemoryImportFile))                                    // DAO IN MEMORY
+
+	rootCmd.Flags().Bool(parameterAuthenticationServiceFake, false, "Use this flag to enable authentication service fake")
+	_ = viper.BindPFlag(parameterAuthenticationServiceFake, rootCmd.Flags().Lookup(parameterAuthenticationServiceFake))
+
+	rootCmd.Flags().String(parameterAuthenticationServiceURI, "", "Use this flag to set the authentication service base URI")
+	_ = viper.BindPFlag(parameterAuthenticationServiceURI, rootCmd.Flags().Lookup(parameterAuthenticationServiceURI))
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -145,4 +155,6 @@ func initConfig() {
 	config.DBName = viper.GetString(parameterDBName)
 	config.DBInMemory = viper.GetBool(parameterDBInMemory)                       // DAO IN MEMORY
 	config.DBInMemoryImportFile = viper.GetString(parameterDBInMemoryImportFile) // DAO IN MEMORY
+	config.AuthenticationServiceFake = viper.GetBool(parameterAuthenticationServiceFake)
+	config.AuthenticationServiceURI = viper.GetString(parameterAuthenticationServiceURI)
 }

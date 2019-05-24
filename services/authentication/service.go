@@ -5,5 +5,5 @@ import (
 )
 
 type Service interface {
-	Introspect(c *gin.Context) (*IntrospectResponse, error)
+	TokenIntrospect(c *gin.Context) (*TokenIntrospectionResponse, error)
 }

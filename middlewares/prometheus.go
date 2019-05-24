@@ -22,7 +22,7 @@ type PrometheusMiddleware struct {
 	latency *prometheus.HistogramVec
 }
 
-func NewPrometheusMiddleware(name string) *PrometheusMiddleware {
+func GetPrometheusMiddleware(name string) gin.HandlerFunc {
 	labels := prometheus.Labels{"service": name}
 
 	m := &PrometheusMiddleware{
@@ -38,10 +38,10 @@ func NewPrometheusMiddleware(name string) *PrometheusMiddleware {
 
 	prometheus.MustRegister(m.latency)
 
-	return m
+	return m.handler()
 }
 
-func (m *PrometheusMiddleware) Handler() gin.HandlerFunc {
+func (m *PrometheusMiddleware) handler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		start := time.Now()
 

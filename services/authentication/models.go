@@ -1,6 +1,6 @@
 package authentication
 
-type IntrospectResponse struct {
+type TokenIntrospectionResponse struct {
 	Active          bool   `json:"active"`
 	IssuedAt        int64  `json:"iat,omitempty"`
 	ExpireAt        int64  `json:"exp,omitempty"`

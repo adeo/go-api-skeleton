@@ -92,8 +92,10 @@ func NewMonitoringRouter(hc *Context) *gin.Engine {
 
 	public.Handle(http.MethodGet, "/_health", hc.GetHealth)
 	public.Handle(http.MethodOptions, "/_health", hc.GetOptionsHandler(httputils.AllowedHeaders, http.MethodGet))
+
 	public.Handle(http.MethodGet, "/openapi", hc.GetOpenAPISchema)
 	public.Handle(http.MethodOptions, "/openapi", hc.GetOptionsHandler(httputils.AllowedHeaders, http.MethodGet))
+
 	public.Handle(http.MethodGet, "/prometheus", gin.WrapH(promhttp.Handler()))
 	public.Handle(http.MethodOptions, "/prometheus", hc.GetOptionsHandler(httputils.AllowedHeaders, http.MethodGet))
 
@@ -114,7 +116,7 @@ func NewAPIRouter(hc *Context) *gin.Engine {
 	router.HandleMethodNotAllowed = true
 
 	router.Use(gin.Recovery())
-	router.Use(middlewares.NewPrometheusMiddleware(ApplicationName).Handler())
+	router.Use(middlewares.GetPrometheusMiddleware(ApplicationName))
 	router.Use(middlewares.GetLoggerMiddleware())
 	router.Use(middlewares.GetHTTPLoggerMiddleware())
 

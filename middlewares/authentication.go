@@ -17,7 +17,7 @@ func GetAuthenticationMiddleware(authService authentication.Service) gin.Handler
 	}
 
 	return func(c *gin.Context) {
-		i, err := authService.Introspect(c)
+		i, err := authService.TokenIntrospect(c)
 		if err != nil {
 			httputils.JSONErrorWithMessage(c.Writer, unauthError, err.Error())
 			c.Abort()
