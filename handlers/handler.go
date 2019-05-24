@@ -73,7 +73,7 @@ func NewHandlersContext(config *Config) *Context {
 		hc.authenticationService = authentication.NewServiceHTTP(config.AuthenticationServiceURI)
 	}
 
-	hc.validator = newValidator()
+	hc.validator = validators.NewValidator()
 	return hc
 }
 
@@ -137,7 +137,7 @@ func handleCORSRoutes(hc *Context, router *gin.Engine) {
 
 func handleAPIRoutes(hc *Context, router *gin.Engine) {
 	public := router.Group(baseURI)
-	public.Use(middlewares.CORSMiddlewareForOthersHTTPMethods())
+	public.Use(middlewares.GetCORSMiddlewareForOthersHTTPMethods())
 
 	secured := public.Group("/")
 	secured.Use(middlewares.GetAuthenticationMiddleware(hc.authenticationService))
@@ -151,29 +151,3 @@ func handleAPIRoutes(hc *Context, router *gin.Engine) {
 	// end: template routes
 }
 
-func newValidator() *validator.Validate {
-	va := validator.New()
-
-	va.RegisterTagNameFunc(func(fld reflect.StructField) string {
-		name := strings.SplitN(fld.Tag.Get("json"), ",", 2)
-		if len(name) < 1 {
-			return ""
-		}
-		return name[0]
-	})
-
-	for k, v := range validators.CustomValidators {
-		if v.Validator != nil {
-			va.RegisterValidationCtx(k, v.Validator)
-		}
-	}
-
-	return va
-}
-
-func (hc *Context) getValidationContext(c *gin.Context) context.Context {
-	vc := &validators.ValidationContext{
-		DB: hc.db,
-	}
-	return context.WithValue(c, validators.ContextKeyValidator, vc)
-}

@@ -46,8 +46,6 @@ var rootCmd = &cobra.Command{
 	Use:   "turbine-go-api-skeleton",
 	Short: "turbine-go-api-skeleton",
 	Run: func(cmd *cobra.Command, args []string) {
-		utils.InitLogger(config.LogLevel, config.LogFormat)
-
 		logrus.
 			WithField(parameterConfigurationFile, cfgFile).
 			WithField(parameterLogLevel, config.LogLevel).
@@ -62,7 +60,9 @@ var rootCmd = &cobra.Command{
 			WithField(parameterAuthenticationServiceURI, config.AuthenticationServiceURI).
 			Warn("Configuration")
 
-		hc := handlers.NewHandlersContext(config)
+		utils.InitLogger(config.LogLevel, config.LogFormat)
+
+		hc := handlers.NewContext(config)
 
 		monitoringRouter := handlers.NewMonitoringRouter(hc)
 		go monitoringRouter.Run(fmt.Sprintf(":%d", config.PortMonitoring))

@@ -10,6 +10,7 @@ const (
 	HeaderNameExpires         = "expires"
 	HeaderNameIfMatch         = "If-Match"
 	HeaderNameLocation        = "location"
+	HeaderNameIfNoneMatch     = "If-None-Match"
 	HeaderNameWWWAuthenticate = "WWW-Authenticate"
 
 	// cors headers
@@ -32,4 +33,5 @@ var AllowedHeaders = []string{
 	HeaderNameCorrelationID,
 	HeaderNameExpires,
 	HeaderNameIfMatch,
+	HeaderNameIfNoneMatch,
 }

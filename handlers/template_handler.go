@@ -42,7 +42,7 @@ func (hc *Context) GetAllTemplates(c *gin.Context) {
 		httputils.JSONErrorWithMessage(c.Writer, model.ErrInternalServer, "Error while getting templates")
 		return
 	}
-	httputils.JSON(c.Writer, http.StatusOK, templates)
+	httputils.JSONOK(c, templates)
 }
 
 // @openapi:path
@@ -84,7 +84,7 @@ func (hc *Context) GetAllTemplates(c *gin.Context) {
 //						schema:
 //							$ref: "#/components/schemas/APIError"
 func (hc *Context) CreateTemplate(c *gin.Context) {
-	b, err := c.GetRawData()
+	body, err := c.GetRawData()
 	if err != nil {
 		utils.GetLoggerFromCtx(c).WithError(err).Error("error while creating template, read data fail")
 		httputils.JSONError(c.Writer, model.ErrInternalServer)
@@ -92,13 +92,13 @@ func (hc *Context) CreateTemplate(c *gin.Context) {
 	}
 
 	templateToCreate := model.TemplateEditable{}
-	err = json.Unmarshal(b, &templateToCreate)
+	err = json.Unmarshal(body, &templateToCreate)
 	if err != nil {
 		httputils.JSONError(c.Writer, model.ErrBadRequestFormat)
 		return
 	}
 
-	err = hc.validator.StructCtx(c, templateToCreate)
+	err = hc.validator.StructCtx(validators.NewContextWithValidationContext(c, hc.db), templateToCreate)
 	if err != nil {
 		httputils.JSONError(c.Writer, validators.NewDataValidationAPIError(err))
 		return
@@ -194,7 +194,7 @@ func (hc *Context) GetTemplate(c *gin.Context) {
 		return
 	}
 
-	httputils.JSON(c.Writer, http.StatusOK, template)
+	httputils.JSONOK(c, template)
 }
 
 // @openapi:path
@@ -355,13 +355,13 @@ func (hc *Context) UpdateTemplate(c *gin.Context) {
 	}
 
 	// check versions
-	if !utils.IsSameVersion(c, template) {
+	if !utils.IsSameVersion(c.GetHeader(httputils.HeaderNameIfMatch), template) {
 		httputils.JSONError(c.Writer, model.ErrVersionMismatched)
 		return
 	}
 
 	// get body and verify data
-	b, err := c.GetRawData()
+	body, err := c.GetRawData()
 	if err != nil {
 		utils.GetLoggerFromCtx(c).WithError(err).Error("error while updating template, read data fail")
 		httputils.JSONError(c.Writer, model.ErrInternalServer)
@@ -369,13 +369,13 @@ func (hc *Context) UpdateTemplate(c *gin.Context) {
 	}
 
 	templateToUpdate := model.TemplateEditable{}
-	err = json.Unmarshal(b, &templateToUpdate)
+	err = json.Unmarshal(body, &templateToUpdate)
 	if err != nil {
 		httputils.JSONError(c.Writer, model.ErrBadRequestFormat)
 		return
 	}
 
-	err = hc.validator.StructCtx(c, templateToUpdate)
+	err = hc.validator.StructCtx(validators.NewContextWithValidationContext(c, hc.db), templateToUpdate)
 	if err != nil {
 		httputils.JSONError(c.Writer, validators.NewDataValidationAPIError(err))
 		return
