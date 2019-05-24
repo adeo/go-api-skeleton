@@ -1,9 +1,7 @@
 package handlers
 
 import (
-	"context"
 	"net/http"
-	"reflect"
 	"strings"
 
 	"github.com/adeo/turbine-go-api-skeleton/middlewares"
@@ -88,7 +86,7 @@ func NewMonitoringRouter(hc *Context) *gin.Engine {
 	router.Use(middlewares.GetHTTPLoggerMiddleware())
 
 	public := router.Group("/")
-	public.Use(middlewares.CORSMiddlewareForOthersHTTPMethods())
+	public.Use(middlewares.GetCORSMiddlewareForOthersHTTPMethods())
 
 	public.Handle(http.MethodGet, "/_health", hc.GetHealth)
 	public.Handle(http.MethodOptions, "/_health", hc.GetOptionsHandler(httputils.AllowedHeaders, http.MethodGet))
@@ -150,4 +148,3 @@ func handleAPIRoutes(hc *Context, router *gin.Engine) {
 	secured.Handle(http.MethodDelete, "/templates/:id", hc.DeleteTemplate)
 	// end: template routes
 }
-
