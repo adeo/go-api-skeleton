@@ -91,8 +91,8 @@ createProject()
     # change go imports
     find . -iname '*.go' -exec ${SED_CMD} -i "s|${OLD_PROJECT_FULL_NAME}|${NEW_PROJECT_FULL_NAME}|g" {} \;
     ${SED_CMD} -i "s|${OLD_PROJECT_FULL_NAME}|${NEW_PROJECT_FULL_NAME}|g" Makefile Dockerfile go.mod client/go.mod
-    ${SED_CMD} -i "s|${OLD_PROJECT_NAME}|${NEW_PROJECT_NAME}|g" Makefile Dockerfile info.yaml cmd/root.go tom.yml .gitlab-ci.yml
-    ${SED_CMD} -i "s|${OLD_PROJECT_GROUP}|${NEW_PROJECT_GROUP}|g" Makefile Dockerfile tom.yml .gitlab-ci.yml
+    ${SED_CMD} -i "s|${OLD_PROJECT_NAME}|${NEW_PROJECT_NAME}|g" Makefile Dockerfile info.yaml cmd/root.go .gitlab-ci.yml
+    ${SED_CMD} -i "s|${OLD_PROJECT_GROUP}|${NEW_PROJECT_GROUP}|g" Makefile Dockerfile .gitlab-ci.yml
     ${SED_CMD} -i "s|${OLD_PROJECT_GIT}|${NEW_PROJECT_GIT}|g" .gitlab-ci.yml
 }
 
