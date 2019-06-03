@@ -1,3 +1,3 @@
-module github.com/denouche/go-api-skeleton/client
+module github.com/adeo/turbine-go-api-skeleton/client
 
 go 1.12
