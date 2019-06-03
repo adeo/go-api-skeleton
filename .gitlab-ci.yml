@@ -1,6 +1,7 @@
 stages:
   - build
   - release
+  - deploy
 
 variables:
   DEV_CONTAINER_IMAGE: adeo-docker-lmfr-go-group-skeleton-dev.jfrog.io/go-group-skeleton/turbine-go-api-skeleton
@@ -43,4 +44,16 @@ release:
     - docker build -t $RELEASE_CONTAINER_IMAGE:$VERSION .
     - docker push $RELEASE_CONTAINER_IMAGE:$VERSION
   only:
+    - master
+  when: manual
+
+turbine-deploy-dev:
+  stage: deploy
+  tags:
+    - adeo-cloud
+  before_script:
+    - docker login -u "$ARTIFACTORY_USER" -p "$ARTIFACTORY_PWD" adeo-docker.jfrog.io
+  script:
+    - docker run adeo-docker.jfrog.io/turbine/turbine-client:latest --username $TURBINE_USER --password $TURBINE_PASSWORD job start image_deploy --environment frlm-turbine-dev --service turbine-go-api-skeleton
+  except:
     - master

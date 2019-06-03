@@ -6,8 +6,8 @@ else
 endif
 
 
-NAME := $(shell cat tom.yml | sed -E '/name:/!d;s/.*: *'"'"'?([^$$])'"'"'?/\1/')
-VERSION := $(shell cat tom.yml | sed -E '/app:/!d;s/.*: *'"'"'?([^$$])'"'"'?/\1/')
+NAME := $(shell cat info.yaml | sed -E '/title:/!d;s/.*: *'"'"'?([^$$])'"'"'?/\1/')
+VERSION := $(shell cat info.yaml | sed -E '/version:/!d;s/.*: *'"'"'?([^$$])'"'"'?/\1/')
 GITHASH := $(shell git rev-parse --short HEAD)
 BUILDDATE := $(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
 
@@ -46,14 +46,13 @@ test: ## run go test
 	go test -v ./...
 
 .PHONY: bump
-bump: ## bump the version in the info.yaml, tom.yml file
+bump: ## bump the version in the info.yaml file
 	NEW_VERSION=`standard-version --dry-run | sed -E '/tagging release/!d;s/.*tagging release *v?(.*)/\1/g'`; \
-		sed -E $(SED_IN_PLACE) 's/^(.*version: *).*$$/\1'$$NEW_VERSION'/' info.yaml; \
-		sed -E $(SED_IN_PLACE) 's/^(.*app: *).*$$/\1'$$NEW_VERSION'/' tom.yml
+		sed -E $(SED_IN_PLACE) 's/^(.*version: *).*$$/\1'$$NEW_VERSION'/' info.yaml
 
 .PHONY: release
-release: bump ## bump the version in the info.yaml, tom.yml, and make a release (commit, tag and push)
-	git add info.yaml tom.yml
+release: bump ## bump the version in the info.yaml, and make a release (commit, tag and push)
+	git add info.yaml
 	standard-version --message "chore(release): %s [ci skip]" --commit-all
 	git push --follow-tags origin HEAD
 
