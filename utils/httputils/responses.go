@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/adeo/turbine-go-api-skeleton/client/model"
+	"github.com/adeo/turbine-go-api-skeleton/pkg/client/model"
 	"github.com/adeo/turbine-go-api-skeleton/utils"
 	"github.com/gin-gonic/gin"
 )

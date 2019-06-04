@@ -3,7 +3,7 @@ package postgresql
 import (
 	"database/sql"
 
-	"github.com/adeo/turbine-go-api-skeleton/client/model"
+	"github.com/adeo/turbine-go-api-skeleton/pkg/client/model"
 	"github.com/adeo/turbine-go-api-skeleton/storage/dao"
 	"github.com/lib/pq"
 )

@@ -1,7 +1,7 @@
 package dao
 
 import (
-	"github.com/adeo/turbine-go-api-skeleton/client/model"
+	"github.com/adeo/turbine-go-api-skeleton/pkg/client/model"
 )
 
 type Database interface {

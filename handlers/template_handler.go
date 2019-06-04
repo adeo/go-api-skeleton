@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/adeo/turbine-go-api-skeleton/client/model"
+	"github.com/adeo/turbine-go-api-skeleton/pkg/client/model"
 	"github.com/adeo/turbine-go-api-skeleton/middlewares"
 	"github.com/adeo/turbine-go-api-skeleton/storage/dao"
 	"github.com/adeo/turbine-go-api-skeleton/storage/validators"
