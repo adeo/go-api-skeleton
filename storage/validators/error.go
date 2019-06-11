@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/adeo/turbine-go-api-skeleton/pkg/client/model"
+	"github.com/adeo/turbine-go-api-skeleton/storage/model"
 	"github.com/adeo/turbine-go-api-skeleton/utils"
 	"gopkg.in/go-playground/validator.v9"
 )

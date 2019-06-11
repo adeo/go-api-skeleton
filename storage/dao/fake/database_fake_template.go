@@ -4,8 +4,9 @@ import (
 	"encoding/json"
 	"errors"
 	"time"
-	"github.com/adeo/turbine-go-api-skeleton/pkg/client/model"
+
 	"github.com/adeo/turbine-go-api-skeleton/storage/dao"
+	"github.com/adeo/turbine-go-api-skeleton/storage/model"
 	"github.com/adeo/turbine-go-api-skeleton/utils"
 	"github.com/satori/go.uuid"
 )

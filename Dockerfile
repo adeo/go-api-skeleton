@@ -7,7 +7,7 @@ RUN apk --no-cache add -U make git musl-dev gcc
 
 WORKDIR /go/src/github.com/adeo/turbine-go-api-skeleton
 COPY . /go/src/github.com/adeo/turbine-go-api-skeleton
-RUN make deps openapi test build
+RUN make deps generate test build
 
 # run
 FROM alpine:latest
