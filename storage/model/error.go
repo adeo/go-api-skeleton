@@ -18,6 +18,13 @@ var (
 		Description: "the data are not valid",
 	}
 
+	// 401
+	ErrInvalidCredentials = APIError{
+		Type:        "unauthorized",
+		HTTPCode:    http.StatusUnauthorized,
+		Description: "Invalid credentials",
+	}
+
 	// 404
 	ErrNotFound = APIError{
 		Type:     "not_found",

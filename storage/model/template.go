@@ -6,8 +6,8 @@ import "time"
 type Template struct {
 	TemplateEditable `bson:",inline"` // avoid having a property "TemplateEditable" in your mongodb document
 	ID               string           `json:"id" bson:"_id"`
-	CreatedAt        time.Time        `json:"createdAt" bson:"createdAt"`
-	UpdatedAt        *time.Time       `json:"updatedAt" bson:"updatedAt"`
+	CreatedAt        time.Time        `json:"created_at" bson:"created_at"`
+	UpdatedAt        *time.Time       `json:"updated_at" bson:"updated_at"`
 }
 
 // @openapi:schema
