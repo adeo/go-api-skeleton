@@ -4,8 +4,9 @@ import (
 	"net/http"
 	"strings"
 
+	authentication "github.com/adeo/turbine-auth/pkg/client/http"
+	"github.com/adeo/turbine-auth/pkg/client/middleware"
 	"github.com/adeo/turbine-go-api-skeleton/middlewares"
-	"github.com/adeo/turbine-go-api-skeleton/services/authentication"
 	"github.com/adeo/turbine-go-api-skeleton/storage/dao"
 	dbFake "github.com/adeo/turbine-go-api-skeleton/storage/dao/fake" // DAO IN MEMORY
 	dbMock "github.com/adeo/turbine-go-api-skeleton/storage/dao/mock"
@@ -138,7 +139,7 @@ func handleAPIRoutes(hc *Context, router *gin.Engine) {
 	public.Use(middlewares.GetCORSMiddlewareForOthersHTTPMethods())
 
 	secured := public.Group("/")
-	secured.Use(middlewares.GetAuthenticationMiddleware(hc.authenticationService))
+	secured.Use(middleware.GetAuthenticationMiddleware(hc.authenticationService))
 
 	// start: template routes
 	secured.Handle(http.MethodGet, "/templates", hc.GetAllTemplates)
