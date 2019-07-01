@@ -59,7 +59,7 @@ release: bump ## bump the version in the info.yaml, and make a release (commit, 
 	git push --tags origin HEAD
 
 .PHONY: openapi
-openapi: ## install openapi-parser and generate openapi schema
+openapi: ## install openapi-parser, generate openapi schema
 	go get github.com/alexjomin/openapi-parser
 	openapi-parser --output openapi.yaml
 	openapi-parser merge --output openapi.yaml --main info.yaml --dir .

@@ -3,7 +3,10 @@ FROM golang:1-alpine as builder
 
 RUN rm -rf /var/cache/apk/* && rm -rf /tmp/*
 RUN apk update
-RUN apk --no-cache add -U make git musl-dev gcc
+RUN apk --no-cache add -U make git musl-dev gcc openssh-client
+
+ARG GITHUB_SSH_PRIVATEKEY
+ENV GITHUB_SSH_PRIVATEKEY=$GITHUB_SSH_PRIVATEKEY
 
 WORKDIR /go/src/github.com/adeo/turbine-go-api-skeleton
 COPY . /go/src/github.com/adeo/turbine-go-api-skeleton

@@ -19,7 +19,7 @@ build:
   tags:
     - adeo-cloud
   script:
-    - docker build -t $DEV_CONTAINER_IMAGE:$CI_COMMIT_REF_SLUG .
+    - docker build --build-arg "GITHUB_SSH_PRIVATEKEY=$GITHUB_SSH_PRIVATEKEY" -t $DEV_CONTAINER_IMAGE:$CI_COMMIT_REF_SLUG .
     - docker push $DEV_CONTAINER_IMAGE:$CI_COMMIT_REF_SLUG
 
 release:
@@ -41,8 +41,9 @@ release:
     - docker run --rm turbine-go-api-skeleton-release:$CI_COMMIT_REF_SLUG bash -c 'eval $(ssh-agent -s) && echo "${GITHUB_SSH_PRIVATEKEY}" | ssh-add - > /dev/null && make release'
     - git pull
     - VERSION=$(git describe --tags --abbrev=0)
-    - docker build -t $RELEASE_CONTAINER_IMAGE:$VERSION .
+    - docker build --build-arg "GITHUB_SSH_PRIVATEKEY=$GITHUB_SSH_PRIVATEKEY" -t $RELEASE_CONTAINER_IMAGE:$VERSION .
     - docker push $RELEASE_CONTAINER_IMAGE:$VERSION
+    - docker run --rm -e"CHANGELOG=$(cat CHANGELOG.md)" -e"PROJECT_NAME=turbine-go-api-skeleton" -e"JIRA_PROJECT_KEY=CLP" -e"SLACK_HOOK_URL=$SLACK_HOOK_URL" adeo-docker-public.jfrog.io/dockerfiles-collection/conventional-changelog-to-slack:latest
   only:
     - master
   when: manual
