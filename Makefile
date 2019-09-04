@@ -35,7 +35,7 @@ start-offline: generate ## start the application in offline mode
 
 .PHONY: deps
 deps: ## get the golang dependencies in the vendor folder
-	GO111MODULE=on go mod vendor
+	GO111MODULE=on GOPRIVATE=github.com/adeo/* go mod vendor
 
 .PHONY: build
 build: ##  build the executable and set the version
