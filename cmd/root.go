@@ -30,6 +30,7 @@ const (
 	parameterPortMonitoring            = "port-monitoring"
 	parameterAuthenticationServiceFake = "authentication-service-fake"
 	parameterAuthenticationServiceURI  = "authentication-service-uri"
+	parameterInsecure                  = "insecure"
 )
 
 var (
@@ -58,6 +59,7 @@ var rootCmd = &cobra.Command{
 			WithField(parameterDBName, config.DBName).
 			WithField(parameterAuthenticationServiceFake, config.AuthenticationServiceFake).
 			WithField(parameterAuthenticationServiceURI, config.AuthenticationServiceURI).
+			WithField(parameterInsecure, config.InsecureSkipVerify).
 			Warn("Configuration")
 
 		utils.InitLogger(config.LogLevel, config.LogFormat)
@@ -157,4 +159,5 @@ func initConfig() {
 	config.DBInMemoryImportFile = viper.GetString(parameterDBInMemoryImportFile) // DAO IN MEMORY
 	config.AuthenticationServiceFake = viper.GetBool(parameterAuthenticationServiceFake)
 	config.AuthenticationServiceURI = viper.GetString(parameterAuthenticationServiceURI)
+	config.InsecureSkipVerify = viper.GetBool(parameterInsecure)
 }

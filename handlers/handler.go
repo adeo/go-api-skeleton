@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"strings"
 
-	authentication "github.com/adeo/turbine-auth/pkg/client/http"
-	"github.com/adeo/turbine-auth/pkg/client/middleware"
+	authentication "github.com/adeo/turbine-auth/pkg/client/v3/http"
+	"github.com/adeo/turbine-auth/pkg/client/v3/middleware"
 	"github.com/adeo/turbine-go-api-skeleton/middlewares"
 	"github.com/adeo/turbine-go-api-skeleton/storage/dao"
 	dbFake "github.com/adeo/turbine-go-api-skeleton/storage/dao/fake" // DAO IN MEMORY
@@ -43,6 +43,7 @@ type Config struct {
 	LogFormat                 string
 	AuthenticationServiceFake bool
 	AuthenticationServiceURI  string
+	InsecureSkipVerify        bool
 }
 
 type Context struct {
@@ -60,7 +61,7 @@ func NewHandlersContext(config *Config) *Context {
 		hc.db = dbFake.NewDatabaseFake(config.DBInMemoryImportFile) // DAO IN MEMORY
 	} else if strings.HasPrefix(config.DBConnectionURI, "postgresql://") { // DAO PG
 		hc.db = postgresql.NewDatabasePostgreSQL(config.DBConnectionURI) // DAO PG
-	} else if strings.HasPrefix(config.DBConnectionURI, "mongodb://") { // DAO MONGO
+	} else if strings.HasPrefix(config.DBConnectionURI, "mongodb") { // DAO MONGO
 		hc.db = mongodb.NewDatabaseMongoDB(config.DBConnectionURI, config.DBName) // DAO MONGO
 	} else {
 		utils.GetLogger().Fatal("no db connection uri given or not handled, and no db in memory mode enabled, exiting")
@@ -69,9 +70,13 @@ func NewHandlersContext(config *Config) *Context {
 	if config.AuthenticationServiceFake {
 		hc.authenticationService = authentication.NewServiceFake()
 	} else {
-		hc.authenticationService = authentication.NewServiceHTTP(config.AuthenticationServiceURI)
+		hc.authenticationService = authentication.NewServiceHTTPWithConfig(&authentication.Config{
+			ApiUrl:             config.AuthenticationServiceURI,
+			DebugHttp:          config.LogLevel == "debug",
+			DebugLogger:        utils.GetLogger().Debugf,
+			InsecureSkipVerify: config.InsecureSkipVerify,
+		})
 	}
-
 	hc.validator = validators.NewValidator()
 	return hc
 }
