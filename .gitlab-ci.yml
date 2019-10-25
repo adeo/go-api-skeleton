@@ -1,60 +1,8 @@
-stages:
-  - build
-  - release
-  - deploy
+include:
+  - project: adeotech/lmfr/turbine/turbine-gitlab-ci-lib
+    file: /turbine-internals/base-build.yml
 
 variables:
-  DEV_CONTAINER_IMAGE: adeo-docker-lmfr-go-group-skeleton-dev.jfrog.io/go-group-skeleton/turbine-go-api-skeleton
-  RELEASE_CONTAINER_IMAGE: adeo-docker-lmfr-go-group-skeleton-release.jfrog.io/go-group-skeleton/turbine-go-api-skeleton
   GITHUB_URL: git@github.com:adeo/turbine-go-api-skeleton.git
+  TURBINE_COMPONENT_NAME: turbine-go-api-skeleton
 
-before_script:
-  - docker login -u "$ARTIFACTORY_USER" -p "$ARTIFACTORY_PWD" adeo-docker-lmfr-go-group-skeleton-dev.jfrog.io
-  - docker login -u "$ARTIFACTORY_USER" -p "$ARTIFACTORY_PWD" adeo-docker-lmfr-go-group-skeleton-release.jfrog.io
-
-image: docker:stable
-
-build:
-  stage: build
-  tags:
-    - adeo-cloud
-  script:
-    - docker build --build-arg "GITHUB_SSH_PRIVATEKEY=$GITHUB_SSH_PRIVATEKEY" -t $DEV_CONTAINER_IMAGE:$CI_COMMIT_REF_SLUG .
-    - docker push $DEV_CONTAINER_IMAGE:$CI_COMMIT_REF_SLUG
-
-release:
-  stage: release
-  image: docker:stable-git
-  tags:
-    - adeo-cloud
-  before_script:
-    # install github private key
-    - eval $(ssh-agent -s) && echo "${GITHUB_SSH_PRIVATEKEY}" | ssh-add - > /dev/null
-    - mkdir -p ~/.ssh && echo "StrictHostKeyChecking no" >> ~/.ssh/config
-    - git checkout -B "$CI_COMMIT_REF_NAME"
-    - git branch --set-upstream-to=origin/$CI_COMMIT_REF_NAME
-    - git remote set-url origin $GITHUB_URL
-    # specify docker login here because local before_script override global before_script
-    - docker login -u "$ARTIFACTORY_USER" -p "$ARTIFACTORY_PWD" adeo-docker-lmfr-go-group-skeleton-release.jfrog.io
-  script:
-    - docker build -f Dockerfile.release --build-arg "GITHUB_ACCOUNT=$GITHUB_ACCOUNT" --build-arg "GITHUB_MAIL=$GITHUB_MAIL" --build-arg "GITHUB_SSH_PRIVATEKEY=$GITHUB_SSH_PRIVATEKEY" -t turbine-go-api-skeleton-release:$CI_COMMIT_REF_SLUG .
-    - docker run --rm turbine-go-api-skeleton-release:$CI_COMMIT_REF_SLUG bash -c 'eval $(ssh-agent -s) && echo "${GITHUB_SSH_PRIVATEKEY}" | ssh-add - > /dev/null && make release'
-    - git pull
-    - VERSION=$(git describe --tags --abbrev=0)
-    - docker build --build-arg "GITHUB_SSH_PRIVATEKEY=$GITHUB_SSH_PRIVATEKEY" -t $RELEASE_CONTAINER_IMAGE:$VERSION .
-    - docker push $RELEASE_CONTAINER_IMAGE:$VERSION
-    - docker run --rm -e"CHANGELOG=$(cat CHANGELOG.md)" -e"PROJECT_NAME=turbine-go-api-skeleton" -e"JIRA_PROJECT_KEY=CLP" -e"SLACK_HOOK_URL=$SLACK_HOOK_URL" adeo-docker-public.jfrog.io/dockerfiles-collection/conventional-changelog-to-slack:latest
-  only:
-    - master
-  when: manual
-
-turbine-deploy-dev:
-  stage: deploy
-  tags:
-    - adeo-cloud
-  before_script:
-    - docker login -u "$ARTIFACTORY_USER" -p "$ARTIFACTORY_PWD" adeo-docker.jfrog.io
-  script:
-    - docker run adeo-docker.jfrog.io/turbine/turbine-client:latest --username $TURBINE_USER --password $TURBINE_PASSWORD job start image_deploy --environment frlm-turbine-dev --service turbine-go-api-skeleton
-  except:
-    - master
